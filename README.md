@@ -1,6 +1,9 @@
 # CAB432-A2
 CAB432-A2
 
+PORT 3000 = Front end project development PORT
+PORT 5000 = Server end project development PORT
+
 ## Key Technology Include
 ```
   ReactJS
