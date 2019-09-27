@@ -58,5 +58,5 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Authors
 
-* **John Santias** - * Developer * - [AsianJohnBoi](https://github.com/AsianJohnBoi)
-* **Eric lee** - * Developer * - [Ericlkl](https://github.com/Ericlkl)
+* **John Santias** - *Developer* - [AsianJohnBoi](https://github.com/AsianJohnBoi)
+* **Eric lee** - *Developer* - [Ericlkl](https://github.com/Ericlkl)
