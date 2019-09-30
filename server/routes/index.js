@@ -3,5 +3,5 @@ const tweets = require('./twitter');
 
 module.exports = app => {
   app.use('/api/test', test);
-  app.use('/api/tweets', tweets);
+  app.use('/analyse', tweets);
 };

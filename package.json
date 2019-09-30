@@ -23,5 +23,11 @@
   "homepage": "https://github.com/Ericlkl/CAB432-A2#readme",
   "devDependencies": {
     "concurrently": "^4.1.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "dotenv": "^8.1.0",
+    "ibm-watson": "^4.5.1",
+    "twit": "^2.2.11"
   }
 }
