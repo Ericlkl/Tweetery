@@ -1,7 +1,15 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, Typography } from '@material-ui/core';
+import {
+  Paper,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon
+} from '@material-ui/core';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
+import TwitterIcon from '@material-ui/icons/Twitter';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -10,7 +18,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Chart = () => {
+const Word = ({ text }) => {
+  return (
+    <ListItem button>
+      <ListItemIcon>
+        <TwitterIcon edge='start' />
+      </ListItemIcon>
+      <ListItemText primary={`#${text}`} />
+    </ListItem>
+  );
+};
+
+const Suggestion = () => {
   const classes = useStyles();
 
   return (
@@ -18,12 +37,14 @@ const Chart = () => {
       <Typography variant='h5' component='h3'>
         Trend <TrendingUpIcon />
       </Typography>
-      <Typography component='p'>
-        Paper can be used to build surface or other elements for your
-        application.
-      </Typography>
+
+      <List component='nav' aria-label='suggestion keywords'>
+        <Word text='Trump' />
+        <Word text='Pikachu' />
+        <Word text='Star War' />
+      </List>
     </Paper>
   );
 };
 
-export default Chart;
+export default Suggestion;
