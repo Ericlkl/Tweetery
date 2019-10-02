@@ -34,7 +34,7 @@ const Suggestion = () => {
 
   return (
     <Paper className={classes.root}>
-      <Typography variant='h5' component='h3'>
+      <Typography color='primary' variant='h5' component='h3'>
         Trend <TrendingUpIcon />
       </Typography>
 
