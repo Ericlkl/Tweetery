@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchField = () => {
+const SearchField = ({ isEditable }) => {
   return (
     <Grid
       container
@@ -36,11 +36,11 @@ const SearchField = () => {
         margin: '1.2rem 0'
       }}
     >
-      <Grid item xs={11}>
+      <Grid item xs={10} sm={11}>
         <TextField
           id='outlined-adornment-amount'
           variant='outlined'
-          label='Tag1'
+          label='Tag'
           value={12}
           style={{
             width: '100%'
@@ -50,7 +50,7 @@ const SearchField = () => {
           }}
         />
       </Grid>
-      <Grid item xs={1}>
+      <Grid item xs={2} sm={1}>
         <ClearIcon />
       </Grid>
     </Grid>

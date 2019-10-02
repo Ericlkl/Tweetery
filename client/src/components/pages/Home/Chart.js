@@ -14,9 +14,11 @@ const Chart = () => {
 
   return (
     <Paper className={classes.root}>
+      {/* Section title */}
       <Typography color='primary' variant='h5' component='h3'>
         Result
       </Typography>
+      {/* Section Content */}
       <Typography component='p'>
         Paper can be used to build surface or other elements for your
         application.
