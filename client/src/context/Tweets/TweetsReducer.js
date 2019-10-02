@@ -2,7 +2,8 @@ import {
   FETCH_TRENDING_TAGS,
   FETCH_RESULT,
   ADD_TAG,
-  REMOVE_TAG
+  REMOVE_TAG,
+  UPDATE_QUERY
 } from '../action';
 
 import uuidv4 from 'uuid/v4';
@@ -32,6 +33,20 @@ export default (state = initState, action) => {
       return {
         ...state,
         result: action.payload
+      };
+    case UPDATE_QUERY:
+      // New value
+      const { id, value } = action.payload;
+      console.log(state.query.tags);
+      return {
+        ...state,
+        query: {
+          tags: state.query.tags.map(tag =>
+            // If the id is match
+            // Update the value, otherwise return the previos tag value
+            tag.id === id ? { ...tag, value } : tag
+          )
+        }
       };
     case ADD_TAG:
       // Deep Copy a tags array from previous state

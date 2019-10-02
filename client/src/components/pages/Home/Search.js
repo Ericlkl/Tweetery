@@ -27,8 +27,13 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchField = ({ tag, removeTag }) => {
+const SearchField = ({ tag }) => {
   const { id, value, removable } = tag;
+  const { updateQuery, removeTag } = useContext(TweetsContext);
+
+  const onInputChange = e => {
+    updateQuery(id, e.target.value);
+  };
 
   return (
     <Grid
@@ -42,10 +47,10 @@ const SearchField = ({ tag, removeTag }) => {
     >
       <Grid item xs={10} sm={11}>
         <TextField
-          id='outlined-adornment-amount'
           variant='outlined'
           label='Tag'
           value={value}
+          onChange={onInputChange}
           style={{
             width: '100%'
           }}
@@ -56,7 +61,9 @@ const SearchField = ({ tag, removeTag }) => {
       </Grid>
       {removable === true ? (
         <Grid item xs={2} sm={1}>
-          <ClearIcon onClick={() => removeTag(id)} />
+          <Fab size='small' onClick={() => removeTag(id)}>
+            <ClearIcon />
+          </Fab>
         </Grid>
       ) : null}
     </Grid>
@@ -97,7 +104,7 @@ const SearchBtn = ({ addTag }) => {
 const Search = props => {
   const classes = useStyles();
 
-  const { query, addTag, removeTag } = useContext(TweetsContext);
+  const { query, addTag } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -106,7 +113,7 @@ const Search = props => {
       </Typography>
 
       {query.tags.map(tag => (
-        <SearchField tag={tag} key={tag.id} removeTag={removeTag} />
+        <SearchField tag={tag} key={tag.id} />
       ))}
       <SearchBtn addTag={addTag} />
     </Paper>

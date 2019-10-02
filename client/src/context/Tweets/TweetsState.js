@@ -3,7 +3,8 @@ import {
   FETCH_TRENDING_TAGS,
   FETCH_RESULT,
   ADD_TAG,
-  REMOVE_TAG
+  REMOVE_TAG,
+  UPDATE_QUERY
 } from '../action';
 import TweetsContext from './TweetsContext';
 import TweetsReducer from './TweetsReducer';
@@ -26,30 +27,38 @@ const initState = {
 const TweetsState = props => {
   const [state, dispatch] = useReducer(TweetsReducer, initState);
 
-  const fetchResult = () => {
+  const fetchResult = () =>
     dispatch({
       type: FETCH_RESULT,
       payload: []
     });
-  };
 
-  const fetchTrendingTags = () => {
+  const fetchTrendingTags = () =>
     dispatch({
       type: FETCH_TRENDING_TAGS,
-      payload: []
+      payload: ['Pizza', 'Hut', 'Green Tea']
     });
-  };
+
+  // Updating the query
+  // Such as inserting the value in the SearchField
+  const updateQuery = (id, value) =>
+    dispatch({
+      type: UPDATE_QUERY,
+      payload: {
+        id,
+        value
+      }
+    });
 
   // Remove Tag in the query
   const addTag = () => dispatch({ type: ADD_TAG });
 
   // Remove Tag in the query
-  const removeTag = id => {
+  const removeTag = id =>
     dispatch({
       type: REMOVE_TAG,
       payload: id
     });
-  };
 
   return (
     <TweetsContext.Provider
@@ -60,6 +69,7 @@ const TweetsState = props => {
         addTag,
         removeTag,
         fetchResult,
+        updateQuery,
         fetchTrendingTags
       }}
     >

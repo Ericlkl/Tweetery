@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Paper,
@@ -35,6 +35,14 @@ const Word = ({ text }) => {
 const Suggestion = () => {
   const classes = useStyles();
   const { trends, fetchTrendingTags } = useContext(TweetsContext);
+
+  // componentDidMount
+  useEffect(() => {
+    // Not Working Yet, Waiting for server setting up
+    fetchTrendingTags();
+
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Paper className={classes.root}>
