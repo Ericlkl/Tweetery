@@ -1,6 +1,13 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button
+} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 
 const useStyles = makeStyles(theme => ({
@@ -17,6 +24,10 @@ const useStyles = makeStyles(theme => ({
     display: 'flex'
   }
 }));
+
+const Link = React.forwardRef((props, ref) => (
+  <RouterLink innerRef={ref} {...props} />
+));
 
 const Navbar = () => {
   const classes = useStyles();
@@ -37,12 +48,22 @@ const Navbar = () => {
         </Typography>
 
         <div className={classes.navbox}>
-          <Typography className={classes.Button} variant='h6'>
+          <Button
+            color='inherit'
+            component={Link}
+            to='/'
+            className={classes.Button}
+          >
             Search
-          </Typography>
-          <Typography className={classes.Button} variant='h6'>
+          </Button>
+          <Button
+            color='inherit'
+            component={Link}
+            to='/about'
+            className={classes.Button}
+          >
             About
-          </Typography>
+          </Button>
         </div>
       </Toolbar>
     </AppBar>
