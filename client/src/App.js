@@ -4,6 +4,7 @@ import Navbar from './components/layout/Navbar';
 import Home from './components/pages/Home/Home';
 import About from './components/pages/About';
 import TweetsState from './context/Tweets/TweetsState';
+
 const App = () => {
   return (
     <TweetsState>

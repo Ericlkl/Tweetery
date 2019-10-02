@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Paper,
@@ -8,8 +8,11 @@ import {
   ListItemText,
   ListItemIcon
 } from '@material-ui/core';
+
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TwitterIcon from '@material-ui/icons/Twitter';
+
+import TweetsContext from '../../../context/Tweets/TweetsContext';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,6 +34,7 @@ const Word = ({ text }) => {
 
 const Suggestion = () => {
   const classes = useStyles();
+  const { trends, fetchTrendingTags } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -39,9 +43,9 @@ const Suggestion = () => {
       </Typography>
 
       <List component='nav' aria-label='suggestion keywords'>
-        <Word text='Trump' />
-        <Word text='Pikachu' />
-        <Word text='Star War' />
+        {trends.map(tagName => (
+          <Word text={tagName} key={tagName} />
+        ))}
       </List>
     </Paper>
   );

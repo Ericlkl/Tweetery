@@ -34,18 +34,28 @@ export default (state = initState, action) => {
         result: action.payload
       };
     case ADD_TAG:
+      // Deep Copy a tags array from previous state
+      // And add new tag instance to query.tags
       return {
         ...state,
-        query: state.query.push({
-          id: uuidv4(),
-          value: '',
-          removable: true
-        })
+        query: {
+          tags: [
+            ...state.query.tags,
+            {
+              id: uuidv4(),
+              value: '',
+              removable: true
+            }
+          ]
+        }
       };
+    // Filter out the target which match the targer id
     case REMOVE_TAG:
       return {
         ...state,
-        trending: action.payload
+        query: {
+          tags: state.query.tags.filter(tag => tag.id !== action.payload)
+        }
       };
     default:
       return state;

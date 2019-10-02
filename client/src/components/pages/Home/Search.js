@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   Paper,
@@ -13,6 +13,8 @@ import ClearIcon from '@material-ui/icons/Clear';
 import SearchIcon from '@material-ui/icons/Search';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
+import TweetsContext from '../../../context/Tweets/TweetsContext';
+
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(2)
@@ -25,15 +27,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SearchField = ({ isEditable }) => {
+const SearchField = ({ tag, removeTag }) => {
+  const { id, value, removable } = tag;
+
   return (
     <Grid
       container
       spacing={2}
-      justify='center'
+      justify='flex-start'
       alignItems='center'
       style={{
-        margin: '1.2rem 0'
+        margin: '2rem 0'
       }}
     >
       <Grid item xs={10} sm={11}>
@@ -41,7 +45,7 @@ const SearchField = ({ isEditable }) => {
           id='outlined-adornment-amount'
           variant='outlined'
           label='Tag'
-          value={12}
+          value={value}
           style={{
             width: '100%'
           }}
@@ -50,18 +54,27 @@ const SearchField = ({ isEditable }) => {
           }}
         />
       </Grid>
-      <Grid item xs={2} sm={1}>
-        <ClearIcon />
-      </Grid>
+      {removable === true ? (
+        <Grid item xs={2} sm={1}>
+          <ClearIcon onClick={() => removeTag(id)} />
+        </Grid>
+      ) : null}
     </Grid>
   );
 };
 
-const SearchBtn = () => {
+const SearchBtn = ({ addTag }) => {
   return (
     <Grid container spacing={2} justify='center'>
       <Grid item>
-        <Fab variant='extended' size='medium' aria-label='search'>
+        <Fab
+          onClick={() => {
+            addTag();
+          }}
+          variant='extended'
+          size='medium'
+          aria-label='search'
+        >
           <AddCircleOutlineIcon style={{ marginRight: '0.5rem' }} />
           Add Query
         </Fab>
@@ -81,8 +94,10 @@ const SearchBtn = () => {
   );
 };
 
-const Search = () => {
+const Search = props => {
   const classes = useStyles();
+
+  const { query, addTag, removeTag } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -90,8 +105,10 @@ const Search = () => {
         Search
       </Typography>
 
-      <SearchField />
-      <SearchBtn />
+      {query.tags.map(tag => (
+        <SearchField tag={tag} key={tag.id} removeTag={removeTag} />
+      ))}
+      <SearchBtn addTag={addTag} />
     </Paper>
   );
 };

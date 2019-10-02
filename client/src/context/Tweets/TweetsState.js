@@ -28,25 +28,25 @@ const TweetsState = props => {
 
   const fetchResult = () => {
     dispatch({
-      action: FETCH_RESULT,
+      type: FETCH_RESULT,
       payload: []
     });
   };
 
   const fetchTrendingTags = () => {
     dispatch({
-      action: FETCH_TRENDING_TAGS,
+      type: FETCH_TRENDING_TAGS,
       payload: []
     });
   };
 
   // Remove Tag in the query
-  const addTag = id => dispatch({ action: ADD_TAG });
+  const addTag = () => dispatch({ type: ADD_TAG });
 
   // Remove Tag in the query
   const removeTag = id => {
     dispatch({
-      action: REMOVE_TAG,
+      type: REMOVE_TAG,
       payload: id
     });
   };
