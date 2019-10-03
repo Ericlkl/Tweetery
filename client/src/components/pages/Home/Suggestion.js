@@ -21,15 +21,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Word = ({ text }) => {
+const Word = ({ text, volume }) => {
   const { addTag } = useContext(TweetsContext);
 
   return (
-    <ListItem onClick={() => addTag(text)} button>
+    <ListItem style={{ width: '100%' }} onClick={() => addTag(text)} button>
       <ListItemIcon>
         <TwitterIcon edge='start' />
       </ListItemIcon>
-      <ListItemText primary={`#${text}`} />
+      <ListItemText primary={text} />
+      <ListItemIcon>
+        <ListItemText edge='end' primary={volume} />
+      </ListItemIcon>
     </ListItem>
   );
 };
@@ -53,8 +56,8 @@ const Suggestion = () => {
       </Typography>
 
       <List component='nav' aria-label='suggestion keywords'>
-        {trends.map(tagName => (
-          <Word text={tagName} key={tagName} />
+        {trends.map(tag => (
+          <Word text={tag.name} volume={tag.tweet_volume} key={tag.name} />
         ))}
       </List>
     </Paper>

@@ -6,12 +6,14 @@ import {
   REMOVE_TAG,
   UPDATE_QUERY
 } from '../action';
+import axios from 'axios';
+import _ from 'lodash';
 import TweetsContext from './TweetsContext';
 import TweetsReducer from './TweetsReducer';
 import uuidv4 from 'uuid/v4';
 
 const initState = {
-  trends: ['Trump', 'Pikachu', 'Star War'],
+  trends: [],
   queries: [
     {
       id: uuidv4(),
@@ -31,11 +33,24 @@ const TweetsState = props => {
       payload: []
     });
 
-  const fetchTrendingTags = () =>
-    dispatch({
-      type: FETCH_TRENDING_TAGS,
-      payload: ['Pizza', 'Hut', 'Green Tea']
-    });
+  const fetchTrendingTags = async () => {
+    try {
+      const res = await axios.get('/api/tweets/trends');
+      const trends = _.remove(res.data, tweet => tweet.tweet_volume > 0).slice(
+        0,
+        10
+      );
+      dispatch({
+        type: FETCH_TRENDING_TAGS,
+        payload: trends
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_TRENDING_TAGS,
+        payload: []
+      });
+    }
+  };
 
   // Updating the query
   // Such as inserting the value in the SearchField

@@ -11,7 +11,7 @@ import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 
 const initState = {
-  trends: ['Trump', 'Pikachu', 'Star War'],
+  trends: [],
   queries: [
     {
       id: uuidv4(),
