@@ -1,22 +1,29 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
 
-var indexRouter = require('./routes/index');
+const indexRouter = require('./routes/index');
 
-var app = express();
+const app = express();
 
-// // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'html');
-
+// Server Set Up
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, '../', 'client', 'build')));
 
-app.use('/', indexRouter);
+// API Routes
+app.use('/api/tweets/', indexRouter);
+
+// Serving Front End Website
+// Making the unused HTTP routes for returning webpage
+// The Server will not get any 404 for unused website, it will return the website instead
+// Don't move it to other place at the moment
+// *** Must Plug it after others API routes , otherwise the API will not works ***
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../', 'client', 'build', 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
