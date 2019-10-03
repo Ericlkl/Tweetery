@@ -32,17 +32,23 @@ router.get('/trends', async (req, res) => {
 // @route  GET api/tweets/analyse
 // @desc   GET specfic movies information
 // @access Public
-router.post('/analyse', function(req, res, next) {
+router.post('/analyse', async (req, res) => {
+  
   // store the search query
   let query = req.body.query;
-  // Obtain all the tweets
-  getTweets(query)
-    .then(response => {
-      res.json(response);
-    })
-    .catch(err => {
-      res.send('Error occured getting tweets');
+
+  try {
+
+    // Obtain tweets from given query
+    const tweets = await getTweets(query);
+
+    // send json data
+    res.json(tweets);
+  } catch (err) {
+    res.status(404).json({
+      error: err
     });
+  }
 });
 
 module.exports = router;

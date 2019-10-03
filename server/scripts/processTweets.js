@@ -52,7 +52,8 @@ const getTrends = async () => {
   return new Promise((resolve, reject) => {
     const params = {
       // New York = 2459115
-      id: '1'
+      // Australia = 23424748
+      id: '23424748'
     };
     // Getting Trends
     T.get('trends/place', params, (err, data) => {
