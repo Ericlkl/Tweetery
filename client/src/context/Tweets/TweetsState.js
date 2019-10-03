@@ -12,15 +12,13 @@ import uuidv4 from 'uuid/v4';
 
 const initState = {
   trends: ['Trump', 'Pikachu', 'Star War'],
-  query: {
-    tags: [
-      {
-        id: uuidv4(),
-        value: '',
-        removable: false
-      }
-    ]
-  },
+  queries: [
+    {
+      id: uuidv4(),
+      value: '',
+      removable: false
+    }
+  ],
   result: {}
 };
 
@@ -51,7 +49,11 @@ const TweetsState = props => {
     });
 
   // Remove Tag in the query
-  const addTag = () => dispatch({ type: ADD_TAG });
+  const addTag = (value = '') =>
+    dispatch({
+      type: ADD_TAG,
+      payload: value
+    });
 
   // Remove Tag in the query
   const removeTag = id =>
@@ -64,7 +66,7 @@ const TweetsState = props => {
     <TweetsContext.Provider
       value={{
         trends: state.trends,
-        query: state.query,
+        queries: state.queries,
         result: state.result,
         addTag,
         removeTag,

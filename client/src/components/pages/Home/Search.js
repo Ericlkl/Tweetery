@@ -104,7 +104,7 @@ const SearchBtn = ({ addTag }) => {
 const Search = props => {
   const classes = useStyles();
 
-  const { query, addTag } = useContext(TweetsContext);
+  const { queries, addTag } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -112,7 +112,7 @@ const Search = props => {
         Search
       </Typography>
 
-      {query.tags.map(tag => (
+      {queries.map(tag => (
         <SearchField tag={tag} key={tag.id} />
       ))}
       <SearchBtn addTag={addTag} />

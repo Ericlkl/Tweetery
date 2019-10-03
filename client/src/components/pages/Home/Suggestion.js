@@ -22,8 +22,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Word = ({ text }) => {
+  const { addTag } = useContext(TweetsContext);
+
   return (
-    <ListItem button>
+    <ListItem onClick={() => addTag(text)} button>
       <ListItemIcon>
         <TwitterIcon edge='start' />
       </ListItemIcon>
