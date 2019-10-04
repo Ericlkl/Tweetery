@@ -23,26 +23,30 @@ const line = (name, color, borderColor, value) => ({
   data: value
 });
 
-const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    line('First Line', 'rgba(75,192,192,0.4)', 'rgba(75,192,192,1)', [65]),
+const LineChart = ({ emotionData }) => {
+  const firstElementName = Object.keys(emotionData)[0];
+  const xlabels = Object.keys(emotionData[firstElementName]);
+  // First layer - Looping through all the Tag Names
+  // Second layer - Looping through all the date
 
-    {
-      label: 'My First dataset',
-      fill: false,
-      lineTension: 0.1,
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      pointHoverBorderWidth: 2,
-      pointRadius: 1,
-      pointHitRadius: 10,
-      data: [80]
-    }
-  ]
-};
+  const joy = [];
 
-const LineChart = () => {
+  Object.keys(emotionData).forEach(name =>
+    Object.keys(emotionData[name]).forEach(date =>
+      joy.push(emotionData[name][date]['joy'])
+    )
+  );
+
+  console.log(joy);
+
+  // Line Chart Setting
+  const data = {
+    labels: xlabels,
+    datasets: [
+      line(firstElementName, 'rgba(75,192,192,0.4)', 'rgba(75,192,192,1)', joy)
+    ]
+  };
+
   return <Line data={data} />;
 };
 

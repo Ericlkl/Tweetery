@@ -21,7 +21,7 @@ const initState = {
       removable: false
     }
   ],
-  result: {}
+  result: null
 };
 
 const TweetsState = props => {

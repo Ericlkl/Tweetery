@@ -19,7 +19,7 @@ const initState = {
       removable: false
     }
   ],
-  result: {}
+  result: null
 };
 
 export default (state = initState, action) => {
