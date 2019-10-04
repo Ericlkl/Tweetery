@@ -1,6 +1,7 @@
 const express = require('express');
 const { getTrends, getTweets } = require('../scripts/processTweets');
-const processAnalysis = require('../scripts/processAnalysis');
+const { extractTweets } = require('../scripts/extract');
+const { analyseTweets } = require('../scripts/processAnalysis');
 
 var router = express.Router();
 
@@ -8,13 +9,7 @@ var router = express.Router();
 // @desc   GET Tweets trend
 // @access Public
 router.get('/trends', async (req, res) => {
-  // To John:
-  // It is a simple example how to use async await for dealing with Promise code
-  // It makes the code clean and easier to read
-  // I suggest we do it in this way :( If we use promise
-  // we will face callback hell .then().then().then() when we implement redis
   try {
-    // Inside the try block, is like writing code in "then" block of the Promise
 
     // This variable will receive the data which cames back from resolve function in Promise
     const trends = await getTrends();
@@ -33,7 +28,7 @@ router.get('/trends', async (req, res) => {
 // @desc   GET specfic movies information
 // @access Public
 router.post('/analyse', async (req, res) => {
-  
+
   // store the search query
   let query = req.body.query;
 
@@ -42,8 +37,14 @@ router.post('/analyse', async (req, res) => {
     // Obtain tweets from given query
     const tweets = await getTweets(query);
 
+    // extract the tweets from the received JSON object 
+    var statuses = extractTweets(tweets.data.statuses);
+
+    // Analyse the tweets
+    const emotions = await analyseTweets(statuses);
+
     // send json data
-    res.json(tweets);
+    res.json(emotions.emotion.document.emotion);
   } catch (err) {
     res.status(404).json({
       error: err
