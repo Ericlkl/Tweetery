@@ -13,23 +13,19 @@ var T = new Twit({
   strictSSL: true // optional - requires SSL certificates to be valid.
 });
 
-async function getTweets(query) {
+async function getTweets(query, day) {
   return new Promise((resolve, reject) => {
     // Construct the search params
     const params = {
       q: query,
       count: 10,
       result_type: 'recent',
-      lang: 'en'
+      lang: 'en',
+      until: day
     };
 
     // search twitter for all tweets containing the query
-    T.get('search/tweets', {
-      q: query,
-      count: 10,
-      result_type: 'recent',
-      lang: 'en'
-    }).then(response => {
+    T.get('search/tweets', params).then(response => {
       // articles found for the search query
       if (response.totalResults !== 0) {
         resolve(response);
