@@ -17,7 +17,7 @@ async function getDataFromCache(redisKey) {
   });
 }
 
-function saveDataToCache(redisKey, expireInSec = 3600 * 24, value) {
+function saveDataToCache(redisKey, expireInSec, value) {
   redisClient.setex(redisKey, expireInSec, JSON.stringify(value));
 }
 

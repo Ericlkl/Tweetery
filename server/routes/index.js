@@ -68,7 +68,7 @@ router.post('/analyse', async (req, res) => {
         // Analyse the tweets
         const emotion = await analyseTweets(statuses);
 
-        saveDataToCache(redisKey, emotion);
+        saveDataToCache(redisKey, 3600, emotion);
 
         results[query][Datekey] = emotion;
       }
