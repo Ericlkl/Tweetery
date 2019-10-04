@@ -71,6 +71,8 @@ const SearchField = ({ tag }) => {
 };
 
 const SearchBtn = ({ addTag }) => {
+  const { fetchResult } = useContext(TweetsContext);
+
   return (
     <Grid container spacing={2} justify='center'>
       <Grid item>
@@ -92,6 +94,7 @@ const SearchBtn = ({ addTag }) => {
           variant='extended'
           size='medium'
           aria-label='search'
+          onClick={fetchResult}
         >
           <SearchIcon style={{ marginRight: '0.5rem' }} />
           Search

@@ -27,11 +27,20 @@ const initState = {
 const TweetsState = props => {
   const [state, dispatch] = useReducer(TweetsReducer, initState);
 
-  const fetchResult = () =>
-    dispatch({
-      type: FETCH_RESULT,
-      payload: []
-    });
+  const fetchResult = async () => {
+    const firstQuery = state.queries[0].value;
+
+    if (firstQuery.length !== 0) {
+      const res = await axios.post('/api/tweets/analyse', {
+        query: firstQuery
+      });
+
+      dispatch({
+        type: FETCH_RESULT,
+        payload: res.data
+      });
+    }
+  };
 
   const fetchTrendingTags = async () => {
     try {

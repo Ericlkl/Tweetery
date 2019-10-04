@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import LineChart from './LineChart';
 import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Typography } from '@material-ui/core';
 
@@ -17,12 +18,9 @@ const Chart = () => {
       {/* Section title */}
       <Typography color='primary' variant='h5' component='h3'>
         Result
+        <LineChart />
       </Typography>
       {/* Section Content */}
-      <Typography component='p'>
-        Paper can be used to build surface or other elements for your
-        application.
-      </Typography>
     </Paper>
   );
 };
