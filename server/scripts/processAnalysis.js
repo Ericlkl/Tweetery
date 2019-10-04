@@ -1,7 +1,5 @@
 // Import Modules
 const express = require('express');
-const router = express.Router();
-const { check, validationResult } = require('express-validator');
 
 // Load the enviroment variables
 require('dotenv').config();
@@ -19,26 +17,24 @@ var nlu = new NaturalLanguageUnderstandingV1({
 
 async function analyseTweets(tweets) {
   return new Promise((resolve, reject) => {
-
     // create object with values
     var params = {
-      'text': tweets,
-      'features': {
-        'emotion': {}
+      text: tweets,
+      features: {
+        emotion: {}
       }
-    }
+    };
 
-    nlu.analyze(params)
-    .then(result => {
-      console.log(result);
-      resolve(result);
-    })
-    .catch(err => {
-      console.log(err);
-    });
-
+    nlu
+      .analyze(params)
+      .then(result => {
+        console.log(result);
+        resolve(result.emotion.document.emotion);
+      })
+      .catch(err => {
+        console.log(err);
+      });
   });
-
 }
 
 module.exports = { analyseTweets };
