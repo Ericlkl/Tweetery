@@ -8,6 +8,10 @@ const { getDataFromCache, saveDataToCache } = require('../services/cache');
 
 const router = express.Router();
 
+// DB models
+var Trending = require('../services/storeTrends');
+
+
 // @route  GET api/tweets/trends
 // @desc   GET Tweets trend
 // @access Public
@@ -17,13 +21,24 @@ router.get('/trends', async (req, res) => {
 
     // If there are trends information saved in Cache
     // Return it to client
-    if (trendsInCache) return res.json(trendsInCache);
+    // if (trendsInCache) return res.json(trendsInCache);
 
     // Get trends data from Twitter
     const trends = await getTrends();
 
     // Only Save Trends data in 5 minutes
-    saveDataToCache('T:trends', 300, trends[0].trends);
+    // saveDataToCache('T:trends', 300, trends[0].trends);
+
+    // store trends data in db
+    let t = new Trending();
+    t.tag = 'Trends';
+    t.save(function(err) {
+      if (err) {
+        console.log('Error saving trend to DB: ', err);
+      } else {
+        console.log('Saved Trends to DB');
+      }
+    })
 
     // Send Trends back to client
     res.json(trends[0].trends);
