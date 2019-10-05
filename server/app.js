@@ -2,8 +2,12 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
+const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
+
+// Load the enviroment variables
+require('dotenv').config();
 
 const app = express();
 
@@ -12,6 +16,26 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, '../', 'client', 'build')));
+
+// Connect to DB
+mongoose.connect('mongodb+srv://' + process.env.MONGO_USERNAME +
+                ':' + process.env.MONGO_PASSWORD + 
+                '@cab432-7yz8m.mongodb.net/admin?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+mongoose.connection.on('connected', function(){
+  console.log("Mongoose default connection is open");
+});
+
+mongoose.connection.on('error', function(err){
+  console.log("Mongoose default connection has occured ");
+});
+
+mongoose.connection.on('disconnected', function(){
+  console.log("Mongoose default connection is disconnected");
+});
 
 // API Routes
 app.use('/api/tweets/', indexRouter);
