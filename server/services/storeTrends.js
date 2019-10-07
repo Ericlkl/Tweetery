@@ -3,9 +3,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var TrendingSchema = new Schema({
-    tag: {
-        type: String,
-        default: null
+    "tag": {
+        "date": {
+            type: String
+        }
+    },
+    "trending": {
+        type: Array,
+        default: null,
     }
 });
 

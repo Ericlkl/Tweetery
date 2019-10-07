@@ -10,6 +10,7 @@ const router = express.Router();
 
 // DB models
 var Trending = require('../services/storeTrends');
+var emotionModel = require('../services/storeEmotion');
 
 
 // @route  GET api/tweets/trends
@@ -29,16 +30,21 @@ router.get('/trends', async (req, res) => {
     // Only Save Trends data in 5 minutes
     // saveDataToCache('T:trends', 300, trends[0].trends);
 
-    // store trends data in db
-    let t = new Trending();
-    t.tag = 'Trends';
-    t.save(function(err) {
-      if (err) {
-        console.log('Error saving trend to DB: ', err);
-      } else {
-        console.log('Saved Trends to DB');
-      }
-    })
+    // get today's date
+    // var today = new Date();
+    // var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+    // // store trends data in db
+    // let t = new Trending();
+    // t.tag.date = date;
+    // t.trending = trends;
+    // t.save(function(err) {
+    //   if (err) {
+    //     console.log('Error saving trend to DB: ', err);
+    //   } else {
+    //     console.log('Saved Trends to DB');
+    //   }
+    // })
 
     // Send Trends back to client
     res.json(trends[0].trends);
