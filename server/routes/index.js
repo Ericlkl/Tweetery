@@ -91,6 +91,19 @@ router.post('/analyse', async (req, res) => {
 
         saveDataToCache(redisKey, 3600, emotion);
 
+        // Save to MongoDB
+        let t = new emotionModel();
+        t.date = Datekey;
+        t.query = query;
+        t.emotions = emotion;
+        t.save(function(err) {
+          if (err) {
+            console.log('Error saving trend to DB: ', err);
+          } else {
+            console.log('Saved Trends to DB');
+          }
+        })
+
         results[query][Datekey] = emotion;
       }
     }
