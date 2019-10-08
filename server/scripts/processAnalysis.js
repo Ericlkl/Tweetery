@@ -28,7 +28,7 @@ async function analyseTweets(tweets) {
     nlu
       .analyze(params)
       .then(result => {
-        console.log(result);
+        // console.log(result);
         resolve(result.emotion.document.emotion);
       })
       .catch(err => {

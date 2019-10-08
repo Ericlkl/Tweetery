@@ -5,7 +5,7 @@ async function getEmotions(Datekey){
         // let emotions = [];
         emotionModel.find({date: Datekey}).then(response => {
             // console.log(response);
-            resolve(JSON.parse(response));
+            resolve(response);
         }).catch(err => {
             resolve(false);
         })

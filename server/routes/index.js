@@ -5,6 +5,7 @@ const { getTrends, getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
 const { getDataFromCache, saveDataToCache } = require('../services/cache');
+const { getEmotions } = require('../services/searchDatabase');
 
 const router = express.Router();
 
@@ -66,9 +67,7 @@ router.post('/analyse', async (req, res) => {
   try {
     const dates = getPassSevenDays();
 
-    const results = {
-      [query]: {}
-    };
+    var results = [];
 
     for (let i = 0; i < dates.length; i++) {
       // Convert date from YYYY-MM-DD to MMMDD As DateKey
@@ -77,10 +76,29 @@ router.post('/analyse', async (req, res) => {
       const Datekey = moment(dates[i]).format('MMMDD');
       const redisKey = `${query}:${Datekey}`;
 
-      const redisCacheData = await getDataFromCache(redisKey);
+      // Find emotions on redis
+      // const redisCacheData = await getDataFromCache(redisKey);
+      const redisCacheData = false;
+
+      // Find emotions on mongoDB
+      const db_emotions = await getEmotions(Datekey);
 
       if (redisCacheData) {
-        results[query][Datekey] = redisCacheData;
+        console.log("Data exists on redis cache");
+        results.push({
+          "date": Datekey,
+          "query": query,
+          "emotions": redisCacheData
+        });
+
+      } else if (db_emotions){
+        console.log("Data exists on mongodb");
+        results = db_emotions;
+
+        // save to redis cache for future access
+        saveDataToCache(redisKey, 3600, db_emotions[0].emotions);
+        // console.log(db_emotions[0].emotions);
+
       } else {
         // Obtain tweets from given query
         const tweets = await getTweets(query, dates[i]);
@@ -104,7 +122,11 @@ router.post('/analyse', async (req, res) => {
           }
         })
 
-        results[query][Datekey] = emotion;
+        results.push({
+          "date": Datekey,
+          "query": query,
+          "emotions": db_emotions
+        });
       }
     }
 
