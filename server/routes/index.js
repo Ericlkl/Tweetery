@@ -92,7 +92,12 @@ router.post('/analyse', async (req, res) => {
 
       } else if (db_emotions){
         console.log("Data exists on mongodb");
-        results = db_emotions;
+        results.push({
+          "id": db_emotions[0]._id,
+          "date": db_emotions[0].date,
+          "query": db_emotions[0].query,
+          "emotions": db_emotions[0].emotions
+        });
 
         // save to redis cache for future access
         saveDataToCache(redisKey, 3600, db_emotions[0].emotions);
