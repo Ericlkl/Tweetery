@@ -77,8 +77,7 @@ router.post('/analyse', async (req, res) => {
       const redisKey = `${query}:${Datekey}`;
 
       // Find emotions on redis
-      // const redisCacheData = await getDataFromCache(redisKey);
-      const redisCacheData = false;
+      const redisCacheData = await getDataFromCache(redisKey);
 
       // Find emotions on mongoDB
       const db_emotions = await getEmotions(Datekey);
