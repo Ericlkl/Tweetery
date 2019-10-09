@@ -7,17 +7,16 @@ import Spinner from '../../layout/Spinner';
 
 import TweetsContext from '../../../context/Tweets/TweetsContext';
 
-const line = (name, color, borderColor, value) => ({
+const line = (name, color, value) => ({
   label: name,
   fill: false,
   lineTension: 0.1,
   backgroundColor: color,
-  borderColor: borderColor,
+  borderColor: color,
   borderCapStyle: 'butt',
   borderDash: [],
   borderDashOffset: 0.0,
   borderJoinStyle: 'miter',
-  pointBorderColor: borderColor,
   pointBackgroundColor: '#fff',
   pointBorderWidth: 1,
   pointHoverRadius: 5,
@@ -28,6 +27,8 @@ const line = (name, color, borderColor, value) => ({
   pointHitRadius: 10,
   data: value
 });
+
+const colors = ['#3e95cd', '#8e5ea2', '#3cba9f', '#e8c3b9', '#c45850'];
 
 const LineChart = () => {
   const { result, chartControl } = useContext(TweetsContext);
@@ -49,24 +50,19 @@ const LineChart = () => {
 
   // Label for x-axis showing Date
   const xlabels = [];
+
   // datasets for showing line
-  const datasets = [];
-
   // Extract all Query name and loop through it
-  Object.keys(result.values).forEach(query => {
-    const value = [];
-
+  const datasets = Object.keys(result.values).map((query, i) => {
     // Extract all Date name and loop through it
-    Object.keys(result.values[query]).forEach(date => {
+    const value = Object.keys(result.values[query]).map(date => {
       xlabels.push(date);
-      value.push(result.values[query][date][chartControl]);
+      return result.values[query][date][chartControl];
     });
 
     // data point for the query is generate completed
     // Make it as a line element
-    datasets.push(
-      line(query, 'rgba(75,192,192,0.4)', 'rgba(75,192,192,1)', value)
-    );
+    return line(query, colors[i], value);
   });
 
   // Line Chart Setting

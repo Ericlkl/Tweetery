@@ -45,11 +45,9 @@ const TweetsState = props => {
   const [state, dispatch] = useReducer(TweetsReducer, initState);
 
   const fetchResult = async () => {
-    const firstQuery = state.queries[0].value;
-
-    if (firstQuery.length === 0) {
+    if (state.queries[0].value.length === 0) {
       return showMsgBox(
-        'Query name can not be Empty ! Please insert the query name!',
+        'First query can not be Empty ! Please insert the keyword for first query!',
         'warning'
       );
     }
@@ -60,10 +58,11 @@ const TweetsState = props => {
 
       showMsgBox('Processing result ...', 'info');
 
+      // Map each query value to from an array only contains query keyword
+      const queries = state.queries.map(query => query.value);
+
       // Fetch Result Data from server
-      const res = await axios.post('/api/tweets/analyse', {
-        query: firstQuery
-      });
+      const res = await axios.post('/api/tweets/analyse', { queries });
 
       const values = {};
 
