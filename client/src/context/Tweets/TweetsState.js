@@ -10,6 +10,7 @@ import {
   FETCH_TRENDING_TAGS,
   SET_CHART_CONTROL
 } from '../action';
+
 import axios from 'axios';
 import _ from 'lodash';
 import TweetsContext from './TweetsContext';
@@ -36,7 +37,7 @@ const initState = {
   messageBox: {
     type: 'error',
     content: 'Error ...',
-    show: true
+    show: false
   }
 };
 
@@ -46,10 +47,20 @@ const TweetsState = props => {
   const fetchResult = async () => {
     const firstQuery = state.queries[0].value;
 
-    if (firstQuery.length !== 0) {
+    if (firstQuery.length === 0) {
+      return showMsgBox(
+        'Tag name can not be Empty ! Please insert the query name and try again !',
+        'warning'
+      );
+    }
+
+    try {
       // Displaying Spinner for user
       dispatch({ type: FETCHING_RESULT });
 
+      showMsgBox('Processing result ...', 'info');
+
+      // Fetch Result Data from server
       const res = await axios.post('/api/tweets/analyse', {
         query: firstQuery
       });
@@ -80,6 +91,10 @@ const TweetsState = props => {
           isloading: false
         }
       });
+
+      showMsgBox('Result Generated Successfully ! ', 'success');
+    } catch (error) {
+      showMsgBox('Fail to connect Server! Please Try again later ', 'error');
     }
   };
 
@@ -99,6 +114,8 @@ const TweetsState = props => {
         }
       });
     } catch (error) {
+      showMsgBox('Fail to connect Server! Please Try again later ', 'error');
+
       dispatch({
         type: FETCH_TRENDING_TAGS,
         payload: []
@@ -121,8 +138,8 @@ const TweetsState = props => {
     dispatch({ type: SET_CHART_CONTROL, payload: controlValue });
 
   // --------------------- Internal Actions -------------------------------
-  const showMsgBox = (message, type) => {
-    dispatch({ type: SHOW_MSG_BOX, payload: { message, type, show: true } });
+  const showMsgBox = (content, type) => {
+    dispatch({ type: SHOW_MSG_BOX, payload: { content, type, show: true } });
   };
 
   const dismissMsgBox = () => dispatch({ type: DISMISS_MSG_BOX });

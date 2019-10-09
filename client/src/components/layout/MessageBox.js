@@ -94,7 +94,7 @@ const MessageBox = () => {
         horizontal: 'center'
       }}
       open={messageBox.show}
-      autoHideDuration={6000}
+      autoHideDuration={3000}
       onClose={dismissMsgBox}
     >
       <MySnackbarContentWrapper
