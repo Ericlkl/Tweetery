@@ -1,6 +1,7 @@
 import React, { useReducer } from 'react';
 import {
   FETCH_TRENDING_TAGS,
+  FETCHING_RESULT,
   FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
@@ -25,7 +26,10 @@ const initState = {
       removable: false
     }
   ],
-  result: {},
+  result: {
+    values: [],
+    isloading: false
+  },
   chartControl: 'joy'
 };
 
@@ -36,11 +40,14 @@ const TweetsState = props => {
     const firstQuery = state.queries[0].value;
 
     if (firstQuery.length !== 0) {
+      // Displaying Spinner for user
+      dispatch({ type: FETCHING_RESULT });
+
       const res = await axios.post('/api/tweets/analyse', {
         query: firstQuery
       });
 
-      const payload = {};
+      const values = {};
 
       /*  Convert Query data format
         {
@@ -53,15 +60,18 @@ const TweetsState = props => {
 
       res.data.forEach(record => {
         const { date, query, emotions } = record;
-        payload[query] = {
-          ...payload[query],
+        values[query] = {
+          ...values[query],
           [date]: { ...emotions }
         };
       });
 
       dispatch({
         type: FETCH_RESULT,
-        payload
+        payload: {
+          values,
+          isloading: false
+        }
       });
     }
   };

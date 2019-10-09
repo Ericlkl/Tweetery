@@ -44,7 +44,7 @@ const Navbar = () => {
           <MenuIcon />
         </IconButton>
         <Typography variant='h6' className={classes.title}>
-          EmoTweets
+          Tweetery
         </Typography>
 
         <div className={classes.navbox}>

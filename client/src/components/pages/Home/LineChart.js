@@ -3,6 +3,8 @@ import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
 import { Grid, Typography } from '@material-ui/core';
 
+import Spinner from '../../layout/Spinner';
+
 import TweetsContext from '../../../context/Tweets/TweetsContext';
 
 const line = (name, color, borderColor, value) => ({
@@ -30,14 +32,16 @@ const line = (name, color, borderColor, value) => ({
 const LineChart = () => {
   const { result, chartControl } = useContext(TweetsContext);
 
-  if (_.isEmpty(result)) {
+  if (_.isEmpty(result.values) && result.isloading === false) {
     return (
       <Grid container justify='center'>
         <Typography variant='subtitle1' gutterBottom>
-          No Record
+          No Record Found
         </Typography>
       </Grid>
     );
+  } else if (_.isEmpty(result.values) && result.isloading === true) {
+    return <Spinner />;
   }
 
   // First layer - Looping through all the Tag Names
@@ -49,13 +53,13 @@ const LineChart = () => {
   const datasets = [];
 
   // Extract all Query name and loop through it
-  Object.keys(result).forEach(query => {
+  Object.keys(result.values).forEach(query => {
     const value = [];
 
     // Extract all Date name and loop through it
-    Object.keys(result[query]).forEach(date => {
+    Object.keys(result.values[query]).forEach(date => {
       xlabels.push(date);
-      value.push(result[query][date][chartControl]);
+      value.push(result.values[query][date][chartControl]);
     });
 
     // data point for the query is generate completed

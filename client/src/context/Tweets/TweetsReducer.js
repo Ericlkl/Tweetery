@@ -1,5 +1,6 @@
 import {
   FETCH_TRENDING_TAGS,
+  FETCHING_RESULT,
   FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
@@ -23,7 +24,10 @@ const initState = {
       removable: false
     }
   ],
-  result: {},
+  result: {
+    values: [],
+    isloading: false
+  },
   chartControl: 'joy'
 };
 
@@ -90,6 +94,15 @@ export default (state = initState, action) => {
       return {
         ...state,
         chartControl: action.payload
+      };
+
+    case FETCHING_RESULT:
+      return {
+        ...state,
+        result: {
+          isloading: true,
+          values: []
+        }
       };
     default:
       return state;
