@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
+  Grid,
   Paper,
   Typography,
   List,
@@ -41,7 +42,7 @@ const Word = ({ text, volume }) => {
 const Suggestion = () => {
   const classes = useStyles();
   const { trends, fetchTrendingTags } = useContext(TweetsContext);
-
+  const { values, isloading } = trends;
   // componentDidMount
   useEffect(() => {
     // Not Working Yet, Waiting for server setting up
@@ -51,13 +52,21 @@ const Suggestion = () => {
   }, []);
 
   const showTrends = () => {
-    if (trends.isloading) {
+    if (isloading) {
       return <Spinner />;
-    } else {
-      return trends.values.map(tag => (
-        <Word text={tag.name} volume={tag.tweet_volume} key={tag.name} />
-      ));
+    } else if (isloading === false && values.length === 0) {
+      return (
+        <Grid container justify='center'>
+          <Typography variant='subtitle1' gutterBottom>
+            No Trends Found
+          </Typography>
+        </Grid>
+      );
     }
+
+    return values.map(tag => (
+      <Word text={tag.name} volume={tag.tweet_volume} key={tag.name} />
+    ));
   };
 
   return (

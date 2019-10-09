@@ -49,7 +49,7 @@ const TweetsState = props => {
 
     if (firstQuery.length === 0) {
       return showMsgBox(
-        'Tag name can not be Empty ! Please insert the query name and try again !',
+        'Query name can not be Empty ! Please insert the query name!',
         'warning'
       );
     }
@@ -86,15 +86,16 @@ const TweetsState = props => {
 
       dispatch({
         type: FETCH_RESULT,
-        payload: {
-          values,
-          isloading: false
-        }
+        payload: { values, isloading: false }
       });
 
       showMsgBox('Result Generated Successfully ! ', 'success');
     } catch (error) {
       showMsgBox('Fail to connect Server! Please Try again later ', 'error');
+      dispatch({
+        type: FETCH_RESULT,
+        payload: { values: [], isloading: false }
+      });
     }
   };
 
@@ -118,7 +119,7 @@ const TweetsState = props => {
 
       dispatch({
         type: FETCH_TRENDING_TAGS,
-        payload: []
+        payload: { values: [], isloading: false }
       });
     }
   };
