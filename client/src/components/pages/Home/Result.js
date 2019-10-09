@@ -1,4 +1,6 @@
 import React, { useContext } from 'react';
+import _ from 'lodash';
+
 import LineChart from './LineChart';
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -9,9 +11,6 @@ import {
   ButtonGroup
 } from '@material-ui/core';
 import TweetsContext from '../../../context/Tweets/TweetsContext';
-
-import SentimentSatisfiedIcon from '@material-ui/icons/SentimentSatisfied';
-import SentimentVeryDissatisfiedIcon from '@material-ui/icons/SentimentVeryDissatisfied';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,9 +30,11 @@ const Result = () => {
         Result
       </Typography>
       {/* Section Content */}
-      {result !== null ? <LineChart emotionData={result} /> : null}
+
+      {_.isEmpty(result) ? null : <LineChart data={result} />}
 
       <Grid
+        container
         style={{
           padding: '1rem 2rem'
         }}

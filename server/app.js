@@ -18,23 +18,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, '../', 'client', 'build')));
 
 // Connect to DB
-mongoose.connect('mongodb+srv://' + process.env.MONGO_USERNAME +
-                ':' + process.env.MONGO_PASSWORD + 
-                '@cab432-7yz8m.mongodb.net/CAB432?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+mongoose.connect(
+  'mongodb+srv://' +
+    process.env.MONGO_USERNAME +
+    ':' +
+    process.env.MONGO_PASSWORD +
+    '@cab432-7yz8m.mongodb.net/CAB432?retryWrites=true&w=majority',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }
+);
+
+mongoose.connection.on('connected', function() {
+  console.log('Connection to MongoDB successful');
 });
 
-mongoose.connection.on('connected', function(){
-  console.log("Connection to MongoDB successful");
+mongoose.connection.on('error', function(err) {
+  console.log('Error occured during Mongoose connection');
 });
 
-mongoose.connection.on('error', function(err){
-  console.log("Error occured during Mongoose connection");
-});
-
-mongoose.connection.on('disconnected', function(){
-  console.log("MongoDB disconnected");
+mongoose.connection.on('disconnected', function() {
+  console.log('MongoDB disconnected');
 });
 
 // API Routes

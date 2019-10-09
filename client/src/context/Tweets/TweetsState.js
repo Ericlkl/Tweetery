@@ -21,7 +21,7 @@ const initState = {
       removable: false
     }
   ],
-  result: null
+  result: {}
 };
 
 const TweetsState = props => {
@@ -35,9 +35,32 @@ const TweetsState = props => {
         query: firstQuery
       });
 
+      const payload = new Object();
+
+      /*  Convert Query data format
+        {
+          Pikachu {
+            Oct02 {
+              sadness: 0.2232
+            },
+            Oct03 {
+              
+            }
+          }
+        }
+      */
+
+      res.data.forEach(record => {
+        const { date, query, emotions } = record;
+        payload[query] = {
+          ...payload[query],
+          [date]: { ...emotions }
+        };
+      });
+
       dispatch({
         type: FETCH_RESULT,
-        payload: res.data
+        payload
       });
     }
   };
