@@ -5,3 +5,6 @@ export const ADD_TAG = 'ADD_QUERY_TAG';
 export const REMOVE_TAG = 'REMOVE_TAG';
 export const UPDATE_QUERY = 'UPDATE_QUERY';
 export const SET_CHART_CONTROL = 'SET_CHART_CONTROL';
+
+export const SHOW_MSG_BOX = 'SHOW_MSG_BOX';
+export const DISMISS_MSG_BOX = 'DISMISS_MSG_BOX';

@@ -1,12 +1,14 @@
 import React, { useReducer } from 'react';
 import {
-  FETCH_TRENDING_TAGS,
-  FETCHING_RESULT,
-  FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
-  SET_CHART_CONTROL,
-  UPDATE_QUERY
+  SHOW_MSG_BOX,
+  DISMISS_MSG_BOX,
+  UPDATE_QUERY,
+  FETCH_RESULT,
+  FETCHING_RESULT,
+  FETCH_TRENDING_TAGS,
+  SET_CHART_CONTROL
 } from '../action';
 import axios from 'axios';
 import _ from 'lodash';
@@ -30,7 +32,12 @@ const initState = {
     values: [],
     isloading: false
   },
-  chartControl: 'joy'
+  chartControl: 'joy',
+  messageBox: {
+    type: 'error',
+    content: 'Error ...',
+    show: true
+  }
 };
 
 const TweetsState = props => {
@@ -102,34 +109,23 @@ const TweetsState = props => {
   // Updating the query
   // Such as inserting the value in the SearchField
   const updateQuery = (id, value) =>
-    dispatch({
-      type: UPDATE_QUERY,
-      payload: {
-        id,
-        value
-      }
-    });
+    dispatch({ type: UPDATE_QUERY, payload: { id, value } });
 
   // Remove Tag in the query
-  const addTag = (value = '') =>
-    dispatch({
-      type: ADD_TAG,
-      payload: value
-    });
+  const addTag = (value = '') => dispatch({ type: ADD_TAG, payload: value });
 
   // Remove Tag in the query
-  const removeTag = id =>
-    dispatch({
-      type: REMOVE_TAG,
-      payload: id
-    });
+  const removeTag = id => dispatch({ type: REMOVE_TAG, payload: id });
 
-  const setChartControl = controlValue => {
-    dispatch({
-      type: SET_CHART_CONTROL,
-      payload: controlValue
-    });
+  const setChartControl = controlValue =>
+    dispatch({ type: SET_CHART_CONTROL, payload: controlValue });
+
+  // --------------------- Internal Actions -------------------------------
+  const showMsgBox = (message, type) => {
+    dispatch({ type: SHOW_MSG_BOX, payload: { message, type, show: true } });
   };
+
+  const dismissMsgBox = () => dispatch({ type: DISMISS_MSG_BOX });
 
   return (
     <TweetsContext.Provider
@@ -138,12 +134,14 @@ const TweetsState = props => {
         queries: state.queries,
         result: state.result,
         chartControl: state.chartControl,
+        messageBox: state.messageBox,
         addTag,
         removeTag,
         fetchResult,
         updateQuery,
         setChartControl,
-        fetchTrendingTags
+        fetchTrendingTags,
+        dismissMsgBox
       }}
     >
       {props.children}

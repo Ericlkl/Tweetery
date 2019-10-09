@@ -3,6 +3,7 @@ import { Grid } from '@material-ui/core';
 import Result from './Result';
 import Suggestion from './Suggestion';
 import Search from './Search';
+import MessageBox from '../../layout/MessageBox';
 
 const Home = () => {
   return (
@@ -25,6 +26,7 @@ const Home = () => {
           <Search />
         </Grid>
       </Grid>
+      <MessageBox />
     </Fragment>
   );
 };

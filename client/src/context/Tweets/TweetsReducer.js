@@ -1,10 +1,12 @@
 import {
-  FETCH_TRENDING_TAGS,
-  FETCHING_RESULT,
-  FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
+  SHOW_MSG_BOX,
+  DISMISS_MSG_BOX,
   UPDATE_QUERY,
+  FETCH_RESULT,
+  FETCHING_RESULT,
+  FETCH_TRENDING_TAGS,
   SET_CHART_CONTROL
 } from '../action';
 
@@ -12,26 +14,7 @@ import _ from 'lodash';
 
 import uuidv4 from 'uuid/v4';
 
-const initState = {
-  trends: {
-    values: [],
-    isloading: true
-  },
-  queries: [
-    {
-      id: uuidv4(),
-      value: '',
-      removable: false
-    }
-  ],
-  result: {
-    values: [],
-    isloading: false
-  },
-  chartControl: 'joy'
-};
-
-export default (state = initState, action) => {
+export default (state, action) => {
   switch (action.type) {
     case FETCH_TRENDING_TAGS:
       return {
@@ -102,6 +85,20 @@ export default (state = initState, action) => {
         result: {
           isloading: true,
           values: []
+        }
+      };
+    case SHOW_MSG_BOX:
+      return {
+        ...state,
+        messageBox: action.payload
+      };
+
+    case DISMISS_MSG_BOX:
+      return {
+        ...state,
+        messageBox: {
+          ...state.messageBox,
+          show: false
         }
       };
     default:
