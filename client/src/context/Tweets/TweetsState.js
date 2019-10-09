@@ -4,6 +4,7 @@ import {
   FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
+  SET_CHART_CONTROL,
   UPDATE_QUERY
 } from '../action';
 import axios from 'axios';
@@ -24,7 +25,8 @@ const initState = {
       removable: false
     }
   ],
-  result: {}
+  result: {},
+  chartControl: 'joy'
 };
 
 const TweetsState = props => {
@@ -112,16 +114,25 @@ const TweetsState = props => {
       payload: id
     });
 
+  const setChartControl = controlValue => {
+    dispatch({
+      type: SET_CHART_CONTROL,
+      payload: controlValue
+    });
+  };
+
   return (
     <TweetsContext.Provider
       value={{
         trends: state.trends,
         queries: state.queries,
         result: state.result,
+        chartControl: state.chartControl,
         addTag,
         removeTag,
         fetchResult,
         updateQuery,
+        setChartControl,
         fetchTrendingTags
       }}
     >

@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useContext } from 'react';
 import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
+import { Grid, Typography } from '@material-ui/core';
+
+import TweetsContext from '../../../context/Tweets/TweetsContext';
 
 const line = (name, color, borderColor, value) => ({
   label: name,
@@ -24,7 +27,19 @@ const line = (name, color, borderColor, value) => ({
   data: value
 });
 
-const LineChart = ({ data }) => {
+const LineChart = () => {
+  const { result, chartControl } = useContext(TweetsContext);
+
+  if (_.isEmpty(result)) {
+    return (
+      <Grid container justify='center'>
+        <Typography variant='subtitle1' gutterBottom>
+          No Record
+        </Typography>
+      </Grid>
+    );
+  }
+
   // First layer - Looping through all the Tag Names
   // Second layer - Looping through all the date
 
@@ -34,13 +49,13 @@ const LineChart = ({ data }) => {
   const datasets = [];
 
   // Extract all Query name and loop through it
-  Object.keys(data).forEach(query => {
+  Object.keys(result).forEach(query => {
     const value = [];
 
     // Extract all Date name and loop through it
-    Object.keys(data[query]).forEach(date => {
+    Object.keys(result[query]).forEach(date => {
       xlabels.push(date);
-      value.push(data[query][date]['joy']);
+      value.push(result[query][date][chartControl]);
     });
 
     // data point for the query is generate completed

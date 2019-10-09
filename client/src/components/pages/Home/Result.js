@@ -1,16 +1,8 @@
-import React, { useContext } from 'react';
-import _ from 'lodash';
-
+import React from 'react';
 import LineChart from './LineChart';
+import ChartControl from './ChartControl';
 import { makeStyles } from '@material-ui/core/styles';
-import {
-  Paper,
-  Typography,
-  Grid,
-  Button,
-  ButtonGroup
-} from '@material-ui/core';
-import TweetsContext from '../../../context/Tweets/TweetsContext';
+import { Paper, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,7 +13,6 @@ const useStyles = makeStyles(theme => ({
 
 const Result = () => {
   const classes = useStyles();
-  const { result } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -31,25 +22,8 @@ const Result = () => {
       </Typography>
       {/* Section Content */}
 
-      {_.isEmpty(result) ? null : <LineChart data={result} />}
-
-      <Grid
-        container
-        style={{
-          padding: '1rem 2rem'
-        }}
-        item
-        xs={12}
-        justify='center'
-      >
-        <ButtonGroup fullWidth aria-label='full width outlined button group'>
-          <Button>Joyful</Button>
-          <Button>Sadness</Button>
-          <Button>Fear</Button>
-          <Button>Disgust</Button>
-          <Button>Anger</Button>
-        </ButtonGroup>
-      </Grid>
+      <LineChart />
+      <ChartControl />
     </Paper>
   );
 };

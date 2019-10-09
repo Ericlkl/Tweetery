@@ -3,7 +3,8 @@ import {
   FETCH_RESULT,
   ADD_TAG,
   REMOVE_TAG,
-  UPDATE_QUERY
+  UPDATE_QUERY,
+  SET_CHART_CONTROL
 } from '../action';
 
 import _ from 'lodash';
@@ -22,7 +23,8 @@ const initState = {
       removable: false
     }
   ],
-  result: {}
+  result: {},
+  chartControl: 'joy'
 };
 
 export default (state = initState, action) => {
@@ -82,6 +84,12 @@ export default (state = initState, action) => {
       return {
         ...state,
         queries: state.queries.filter(tag => tag.id !== action.payload)
+      };
+
+    case SET_CHART_CONTROL:
+      return {
+        ...state,
+        chartControl: action.payload
       };
     default:
       return state;
