@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import _ from 'lodash';
 import { Line } from 'react-chartjs-2';
 
 const line = (name, color, borderColor, value) => ({
@@ -27,32 +28,32 @@ const LineChart = ({ data }) => {
   // First layer - Looping through all the Tag Names
   // Second layer - Looping through all the date
 
+  // Label for x-axis showing Date
   const xlabels = [];
+  // datasets for showing line
+  const datasets = [];
 
-  const result = [];
-
-  // Query is String
+  // Extract all Query name and loop through it
   Object.keys(data).forEach(query => {
     const value = [];
 
-    // Date is String
+    // Extract all Date name and loop through it
     Object.keys(data[query]).forEach(date => {
       xlabels.push(date);
       value.push(data[query][date]['joy']);
     });
 
-    result.push(
+    // data point for the query is generate completed
+    // Make it as a line element
+    datasets.push(
       line(query, 'rgba(75,192,192,0.4)', 'rgba(75,192,192,1)', value)
     );
   });
 
-  console.log(xlabels);
-  console.log(result);
-
   // Line Chart Setting
   const chartData = {
-    labels: xlabels,
-    datasets: result
+    labels: _.uniq(xlabels),
+    datasets
   };
 
   return <Line data={chartData} />;

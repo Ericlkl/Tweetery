@@ -11,7 +11,10 @@ import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 
 const initState = {
-  trends: [],
+  trends: {
+    values: [],
+    isloading: true
+  },
   queries: [
     {
       id: uuidv4(),

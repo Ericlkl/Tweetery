@@ -13,7 +13,10 @@ import TweetsReducer from './TweetsReducer';
 import uuidv4 from 'uuid/v4';
 
 const initState = {
-  trends: [],
+  trends: {
+    values: [],
+    isloading: true
+  },
   queries: [
     {
       id: uuidv4(),
@@ -35,17 +38,13 @@ const TweetsState = props => {
         query: firstQuery
       });
 
-      const payload = new Object();
+      const payload = {};
 
       /*  Convert Query data format
         {
-          Pikachu {
-            Oct02 {
-              sadness: 0.2232
-            },
-            Oct03 {
-              
-            }
+          Pikachu : {
+            Oct02 : { sadness: 0.2232 },
+            Oct03 : {}
           }
         }
       */
@@ -68,13 +67,17 @@ const TweetsState = props => {
   const fetchTrendingTags = async () => {
     try {
       const res = await axios.get('/api/tweets/trends');
-      const trends = _.remove(res.data, tweet => tweet.tweet_volume > 0).slice(
+      const values = _.remove(res.data, tweet => tweet.tweet_volume > 0).slice(
         0,
         10
       );
+
       dispatch({
         type: FETCH_TRENDING_TAGS,
-        payload: trends
+        payload: {
+          values,
+          isloading: false
+        }
       });
     } catch (error) {
       dispatch({

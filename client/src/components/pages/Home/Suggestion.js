@@ -12,6 +12,7 @@ import {
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TwitterIcon from '@material-ui/icons/Twitter';
 
+import Spinner from '../../layout/Spinner';
 import TweetsContext from '../../../context/Tweets/TweetsContext';
 
 const useStyles = makeStyles(theme => ({
@@ -49,6 +50,16 @@ const Suggestion = () => {
     // eslint-disable-next-line
   }, []);
 
+  const showTrends = () => {
+    if (trends.isloading) {
+      return <Spinner />;
+    } else {
+      return trends.values.map(tag => (
+        <Word text={tag.name} volume={tag.tweet_volume} key={tag.name} />
+      ));
+    }
+  };
+
   return (
     <Paper className={classes.root}>
       <Typography color='primary' variant='h5' component='h3'>
@@ -56,9 +67,7 @@ const Suggestion = () => {
       </Typography>
 
       <List component='nav' aria-label='suggestion keywords'>
-        {trends.map(tag => (
-          <Word text={tag.name} volume={tag.tweet_volume} key={tag.name} />
-        ))}
+        {showTrends()}
       </List>
     </Paper>
   );
