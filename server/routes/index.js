@@ -77,18 +77,13 @@ router.post('/analyse', async (req, res) => {
       if (redisCacheData) {
         console.log('Data exists on redis cache');
         results.push({
-          date: date,
-          query: query,
+          date,
+          query,
           emotions: redisCacheData
         });
       } else if (db_emotions) {
         console.log('Data exists on mongodb');
-        results.push({
-          id: db_emotions[0]._id,
-          date: db_emotions[0].date,
-          query: db_emotions[0].query,
-          emotions: db_emotions[0].emotions
-        });
+        results.push(db_emotions[0]);
 
         // save to redis cache for future access
         saveDataToCache(redisKey, 3600, db_emotions[0].emotions);
@@ -97,30 +92,17 @@ router.post('/analyse', async (req, res) => {
         // Obtain tweets from given query
         const tweets = await getTweets(query, date);
         // extract the tweets from the received JSON object
-        var statuses = extractTweets(tweets.data.statuses);
+        const statuses = extractTweets(tweets.data.statuses);
         // Analyse the tweets
-        const emotion = await analyseTweets(statuses);
+        const emotions = await analyseTweets(statuses);
 
         saveDataToCache(redisKey, 3600, emotion);
 
         // Save to MongoDB
-        let t = new emotionModel();
-        t.date = date;
-        t.query = query;
-        t.emotions = emotion;
-        t.save(function(err) {
-          if (err) {
-            console.log('Error saving trend to DB: ', err);
-          } else {
-            console.log('Saved Trends to DB');
-          }
-        });
+        // If error happens, it will automatically run catch block
+        await new emotionModel({ date, query, emotions }).save();
 
-        results.push({
-          date: date,
-          query: query,
-          emotions: db_emotions
-        });
+        results.push({ date, query, emotions });
       }
     });
 
