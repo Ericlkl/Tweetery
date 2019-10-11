@@ -1,5 +1,5 @@
 const express = require('express');
-const moment = require('moment');
+const { forEach } = require('p-iteration');
 const { getPassSevenDays } = require('../scripts/date');
 const { getTrends, getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
@@ -62,29 +62,22 @@ router.get('/trends', async (req, res) => {
 router.post('/analyse', async (req, res) => {
   // store the search query
   const { query } = req.body;
+  var results = [];
 
   try {
-    const dates = getPassSevenDays();
-
-    var results = [];
-
-    for (let i = 0; i < dates.length; i++) {
-      // Convert date from YYYY-MM-DD to MMMDD As DateKey
-      // YYYY-MM-DD = '2019-10-04'
-      // MMMDD = 'Oct04'
-      const Datekey = moment(dates[i]).format('MMMDD');
-      const redisKey = `${query}:${Datekey}`;
+    await forEach(getPassSevenDays(), async date => {
+      const redisKey = `${query}:${date}`;
 
       // Find emotions on redis
       const redisCacheData = await getDataFromCache(redisKey);
 
       // Find emotions on mongoDB
-      const db_emotions = await getEmotions(Datekey);
+      const db_emotions = await getEmotions(date);
 
       if (redisCacheData) {
         console.log('Data exists on redis cache');
         results.push({
-          date: Datekey,
+          date: date,
           query: query,
           emotions: redisCacheData
         });
@@ -102,7 +95,7 @@ router.post('/analyse', async (req, res) => {
         // console.log(db_emotions[0].emotions);
       } else {
         // Obtain tweets from given query
-        const tweets = await getTweets(query, dates[i]);
+        const tweets = await getTweets(query, date);
         // extract the tweets from the received JSON object
         var statuses = extractTweets(tweets.data.statuses);
         // Analyse the tweets
@@ -112,7 +105,7 @@ router.post('/analyse', async (req, res) => {
 
         // Save to MongoDB
         let t = new emotionModel();
-        t.date = Datekey;
+        t.date = date;
         t.query = query;
         t.emotions = emotion;
         t.save(function(err) {
@@ -124,12 +117,12 @@ router.post('/analyse', async (req, res) => {
         });
 
         results.push({
-          date: Datekey,
+          date: date,
           query: query,
           emotions: db_emotions
         });
       }
-    }
+    });
 
     // send json data
     res.json(results);
