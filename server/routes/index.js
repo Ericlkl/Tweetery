@@ -6,6 +6,7 @@ const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
 const { getDataFromCache, saveDataToCache } = require('../services/cache');
 const { getEmotions } = require('../services/searchDatabase');
+const { analyseEndPointValidator } = require('../middlewares');
 
 const router = express.Router();
 
@@ -59,7 +60,8 @@ router.get('/trends', async (req, res) => {
 // @route  POST api/tweets/analyse
 // @desc   Sending Query to get emotion data related to keyword in pass seven days
 // @access Public
-router.post('/analyse', async (req, res) => {
+// @body   { queries: [] }
+router.post('/analyse', analyseEndPointValidator, async (req, res) => {
   // store the search query
   const { queries } = req.body;
 
