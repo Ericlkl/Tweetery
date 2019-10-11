@@ -1,0 +1,24 @@
+version: '2'
+services:
+    node-server:
+        image: "asianjohnboi/tweetery"
+        ports:
+          - "5000:5000"
+        networks:
+          tweetery-network:
+            ipv4_address: "172.18.0.2"
+          
+    redis-server:
+        image: redis
+        ports:
+          - "6379:6379"
+        networks:
+          tweetery-network:
+            ipv4_address: "172.18.0.3"
+
+networks:
+  tweetery-network:
+    driver: bridge
+    ipam: 
+      config:
+        - subnet: 172.18.0.0/16
