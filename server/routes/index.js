@@ -61,49 +61,68 @@ router.get('/trends', async (req, res) => {
 // @access Public
 router.post('/analyse', async (req, res) => {
   // store the search query
-  const { query } = req.body;
+  const { queries } = req.body;
+
   var results = [];
 
   try {
     await forEach(getPassSevenDays(), async date => {
-      const redisKey = `${query}:${date}`;
+      await forEach(queries, async query => {
+        const redisKey = `${query}:${date}`;
 
-      // Find emotions on redis
-      const redisCacheData = await getDataFromCache(redisKey);
+        // Find emotions on redis
+        const redisCacheData = await getDataFromCache(redisKey);
 
-      // Find emotions on mongoDB
-      const db_emotions = await getEmotions(date);
+        // Find emotions on mongoDB
+        const db_emotions = await getEmotions(date);
 
-      if (redisCacheData) {
-        console.log('Data exists on redis cache');
-        results.push({
-          date,
-          query,
-          emotions: redisCacheData
-        });
-      } else if (db_emotions) {
-        console.log('Data exists on mongodb');
-        results.push(db_emotions[0]);
+        if (redisCacheData) {
+          console.log('Data exists on redis cache');
+          results.push({
+            date,
+            query,
+            emotions: redisCacheData
+          });
+          // To John:
+          // Disable this else if block to fix the analyse function
+        } else if (db_emotions) {
+          // MongoDB is always return true
+          // Because the find method always find the emotion data by Date
+          // The Trump data is always be selected, because it exist a date it match pass7days
+          // Therefore, Raw data will never be analyse. it will always be using trump data
+          // But don't worry, I can fix it very quickly once the raw analyse function be fixed
+          console.log('Data exists on mongodb');
+          results.push(db_emotions);
 
-        // save to redis cache for future access
-        saveDataToCache(redisKey, 3600, db_emotions[0].emotions);
-        // console.log(db_emotions[0].emotions);
-      } else {
-        // Obtain tweets from given query
-        const tweets = await getTweets(query, date);
-        // extract the tweets from the received JSON object
-        const statuses = extractTweets(tweets.data.statuses);
-        // Analyse the tweets
-        const emotions = await analyseTweets(statuses);
+          // save to redis cache for future access
+          saveDataToCache(redisKey, 3600, db_emotions.emotions);
+        } else {
+          console.log('Fetch The Raw data');
+          // Obtain tweets from given query
+          const tweets = await getTweets(query, date);
 
-        saveDataToCache(redisKey, 3600, emotion);
+          // The problem starts from the next line
+          // tweets.data.statuses always return empty array
+          // I don't know how to fix it :(
 
-        // Save to MongoDB
-        // If error happens, it will automatically run catch block
-        await new emotionModel({ date, query, emotions }).save();
+          // extract the tweets from the received JSON object
+          const statuses = extractTweets(tweets.data.statuses);
+          // Analyse the tweets
+          const emotions = await analyseTweets(statuses);
 
-        results.push({ date, query, emotions });
-      }
+          saveDataToCache(redisKey, 3600, emotion);
+
+          // Save to MongoDB
+          // If error happens, it will automatically run catch block
+
+          // JS Tips ---
+          // { date, query, emotions } is a short cut form
+          // === { date:date, query:query, emotions:emotions } it is exact same
+          await new emotionModel({ date, query, emotions }).save();
+
+          results.push({ date, query, emotions });
+        }
+      });
     });
 
     // send json data
