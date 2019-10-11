@@ -48,7 +48,7 @@ const SearchField = ({ tag }) => {
       <Grid item xs={10} sm={11}>
         <TextField
           variant='outlined'
-          label='Tag'
+          label='Query'
           value={value}
           onChange={onInputChange}
           style={{

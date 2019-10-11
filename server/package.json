@@ -20,6 +20,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.7.3",
     "morgan": "^1.9.1",
+    "p-iteration": "^1.1.8",
     "redis": "^2.8.0",
     "twit": "^2.2.11",
     "twitter": "^1.7.1"

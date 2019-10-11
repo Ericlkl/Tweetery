@@ -15,6 +15,7 @@
     "react-router": "^5.1.0",
     "react-router-dom": "^5.1.0",
     "react-scripts": "3.1.2",
+    "react-window": "^1.8.5",
     "uuid": "^3.3.3"
   },
   "scripts": {

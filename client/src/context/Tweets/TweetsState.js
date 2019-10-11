@@ -130,7 +130,15 @@ const TweetsState = props => {
     dispatch({ type: UPDATE_QUERY, payload: { id, value } });
 
   // Remove Tag in the query
-  const addTag = (value = '') => dispatch({ type: ADD_TAG, payload: value });
+  const addTag = (value = '') => {
+    if (state.queries.length === 5) {
+      return showMsgBox(
+        'The number of quries can not more than 5! Please remove unnessary query and try again !',
+        'error'
+      );
+    }
+    dispatch({ type: ADD_TAG, payload: value });
+  };
 
   // Remove Tag in the query
   const removeTag = id => dispatch({ type: REMOVE_TAG, payload: id });

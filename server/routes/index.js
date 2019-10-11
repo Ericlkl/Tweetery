@@ -13,7 +13,6 @@ const router = express.Router();
 var Trending = require('../services/storeTrends');
 var emotionModel = require('../services/storeEmotion');
 
-
 // @route  GET api/tweets/trends
 // @desc   GET Tweets trend
 // @access Public
@@ -83,26 +82,24 @@ router.post('/analyse', async (req, res) => {
       const db_emotions = await getEmotions(Datekey);
 
       if (redisCacheData) {
-        console.log("Data exists on redis cache");
+        console.log('Data exists on redis cache');
         results.push({
-          "date": Datekey,
-          "query": query,
-          "emotions": redisCacheData
+          date: Datekey,
+          query: query,
+          emotions: redisCacheData
         });
-
-      } else if (db_emotions){
-        console.log("Data exists on mongodb");
+      } else if (db_emotions) {
+        console.log('Data exists on mongodb');
         results.push({
-          "id": db_emotions[0]._id,
-          "date": db_emotions[0].date,
-          "query": db_emotions[0].query,
-          "emotions": db_emotions[0].emotions
+          id: db_emotions[0]._id,
+          date: db_emotions[0].date,
+          query: db_emotions[0].query,
+          emotions: db_emotions[0].emotions
         });
 
         // save to redis cache for future access
         saveDataToCache(redisKey, 3600, db_emotions[0].emotions);
         // console.log(db_emotions[0].emotions);
-
       } else {
         // Obtain tweets from given query
         const tweets = await getTweets(query, dates[i]);
@@ -124,12 +121,12 @@ router.post('/analyse', async (req, res) => {
           } else {
             console.log('Saved Trends to DB');
           }
-        })
+        });
 
         results.push({
-          "date": Datekey,
-          "query": query,
-          "emotions": db_emotions
+          date: Datekey,
+          query: query,
+          emotions: db_emotions
         });
       }
     }
