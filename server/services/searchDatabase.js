@@ -1,10 +1,10 @@
 var emotionModel = require('./storeEmotion');
 
-async function getEmotions(Datekey) {
+async function getEmotions(Datekey, queried) {
   return new Promise((resolve, reject) => {
     // let emotions = [];
     emotionModel
-      .findOne({ date: Datekey })
+      .findOne({ date: Datekey, query: queried })
       .then(response => {
         if (response.length == 0) {
           return resolve(false);

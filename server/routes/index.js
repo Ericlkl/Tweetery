@@ -63,7 +63,9 @@ router.get('/trends', async (req, res) => {
 // @body   { queries: [] }
 router.post('/analyse', analyseEndPointValidator, async (req, res) => {
   // store the search query
+  // console.log(req);
   const { queries } = req.body;
+  console.log(queries);
 
   var results = [];
 
@@ -76,7 +78,7 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
         const redisCacheData = await getDataFromCache(redisKey);
 
         // Find emotions on mongoDB
-        const db_emotions = await getEmotions(date);
+        const db_emotions = await getEmotions(date, query);
 
         if (redisCacheData) {
           console.log('Data exists on redis cache');
@@ -102,24 +104,19 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
           console.log('Fetch The Raw data');
           // Obtain tweets from given query
           const tweets = await getTweets(query, date);
-
-          // The problem starts from the next line
-          // tweets.data.statuses always return empty array
-          // I don't know how to fix it :(
+          // add errir handling for empty tweets
 
           // extract the tweets from the received JSON object
           const statuses = extractTweets(tweets.data.statuses);
+          
           // Analyse the tweets
+          // Need to add error handling, IBM won't analyse other languages
+          // Twitter api doesn't filter out english tweets properly
           const emotions = await analyseTweets(statuses);
 
-          saveDataToCache(redisKey, 3600, emotion);
+          saveDataToCache(redisKey, 3600, emotions);
 
           // Save to MongoDB
-          // If error happens, it will automatically run catch block
-
-          // JS Tips ---
-          // { date, query, emotions } is a short cut form
-          // === { date:date, query:query, emotions:emotions } it is exact same
           await new emotionModel({ date, query, emotions }).save();
 
           results.push({ date, query, emotions });
