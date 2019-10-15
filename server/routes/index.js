@@ -101,7 +101,7 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
           // save to redis cache for future access
           saveDataToCache(redisKey, 3600, db_emotions.emotions);
         } else {
-          console.log('Fetch The Raw data');
+          console.log('Fetch The Raw data and save to cache and db');
           // Obtain tweets from given query
           const tweets = await getTweets(query, date);
           // add errir handling for empty tweets
@@ -110,8 +110,6 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
           const statuses = extractTweets(tweets.data.statuses);
           
           // Analyse the tweets
-          // Need to add error handling, IBM won't analyse other languages
-          // Twitter api doesn't filter out english tweets properly
           const emotions = await analyseTweets(statuses);
 
           saveDataToCache(redisKey, 3600, emotions);
@@ -127,7 +125,6 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
     // send json data
     res.json(results);
   } catch (err) {
-    console.error(err);
     res.status(404).json({
       error: err
     });

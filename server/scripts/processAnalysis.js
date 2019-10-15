@@ -32,7 +32,7 @@ async function analyseTweets(tweets) {
         resolve(result.emotion.document.emotion);
       })
       .catch(err => {
-        console.log(err);
+        reject(err);
       });
   });
 }
