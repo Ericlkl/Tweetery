@@ -17,20 +17,8 @@ var T = new Twit({
 // Import twit library
 var Twit = require('twit');
 
-async function myTimer() {
-    try {
-        // analyse the tweets
-        const emotions = await analyseSentiment(data);
-        console.log(emotions);
-
-        // save to db
-
-        // flush data
-        data = '';
-    } catch (err) {
-        return err;
-    }
-}
+// DB models
+var sentimentModel = require('../services/storeSentiment');
 
 let stream;
 let myVar;
@@ -39,6 +27,22 @@ let data = '';
 router.post('/stream', function(req, res, next) {
     const query = req.body.query;
     myVar = setInterval(myTimer, 10000);
+
+    async function myTimer() {
+        try {
+            // analyse the tweets
+            const sentiment = await analyseSentiment(data);
+            console.log(sentiment);
+    
+            // save to db
+            await new sentimentModel({ query, sentiment }).save();
+    
+            // flush data
+            data = '';
+        } catch (err) {
+            return err;
+        }
+    }
 
     var toSearch = {
         track: [query],
