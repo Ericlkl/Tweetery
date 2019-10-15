@@ -21,7 +21,7 @@ async function analyseTweets(tweets) {
     var params = {
       text: tweets,
       features: {
-        emotion: {}
+        emotion: {},
       }
     };
 
@@ -37,4 +37,25 @@ async function analyseTweets(tweets) {
   });
 }
 
-module.exports = { analyseTweets };
+async function analyseSentiment(tweets) {
+  return new Promise((resolve, reject) => {
+    // create object with values
+    var params = {
+      text: tweets,
+      features: {
+        sentiment: {}
+      }
+    };
+
+    nlu
+      .analyze(params)
+      .then(result => {
+        resolve(result.sentiment.document);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
+module.exports = { analyseTweets, analyseSentiment };
