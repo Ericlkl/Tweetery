@@ -3,6 +3,7 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Home from './components/pages/Home/Home';
 import About from './components/pages/About';
+import LiveTweets from './components/pages/Stream/LiveTweets';
 import TweetsState from './context/Tweets/TweetsState';
 
 const App = () => {
@@ -13,6 +14,7 @@ const App = () => {
           <Navbar />
           <Switch>
             <Route path='/' exact component={Home} />
+            <Route path='/live' exact component={LiveTweets} />
             <Route path='/about' exact component={About} />
           </Switch>
         </Fragment>
