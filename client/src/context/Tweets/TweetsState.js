@@ -98,6 +98,61 @@ const TweetsState = props => {
     }
   };
 
+  // To start streaming data
+  const fetchStream = async () => {
+    if (state.queries[0].value.length === 0) {
+      return showMsgBox(
+        'First query can not be Empty ! Please insert the keyword for first query!',
+        'warning'
+      );
+    }
+
+    try {
+      // Displaying Spinner for user
+      dispatch({ type: FETCHING_RESULT });
+
+      showMsgBox('Processing result ...', 'info');
+
+      // Map each query value to from an array only contains query keyword
+      const queries = state.queries.map(query => query.value);
+
+      // Fetch Result Data from server
+      const res = await axios.post('/api/tweets/stream', { queries });
+
+      const values = {};
+
+      /*  Convert Query data format
+        {
+          Pikachu : {
+            Oct02 : { sadness: 0.2232 },
+            Oct03 : {}
+          }
+        }
+      */
+
+      res.data.forEach(record => {
+        const { date, query, emotions } = record;
+        values[query] = {
+          ...values[query],
+          [date]: { ...emotions }
+        };
+      });
+
+      dispatch({
+        type: FETCH_RESULT,
+        payload: { values, isloading: false }
+      });
+
+      showMsgBox('Result Generated Successfully ! ', 'success');
+    } catch (error) {
+      showMsgBox('Fail to connect Server! Please Try again later ', 'error');
+      dispatch({
+        type: FETCH_RESULT,
+        payload: { values: [], isloading: false }
+      });
+    }
+  };
+
   const fetchTrendingTags = async () => {
     try {
       const res = await axios.get('/api/tweets/trends');
@@ -163,6 +218,7 @@ const TweetsState = props => {
         addTag,
         removeTag,
         fetchResult,
+        fetchStream,
         updateQuery,
         setChartControl,
         fetchTrendingTags,

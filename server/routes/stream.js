@@ -24,26 +24,31 @@ let data = '';
 
 router.post('/stream', function(req, res, next) {
     try {
-        const query = req.body.query;
-        timer = setInterval(sendData, 30000); // sends data every minute
+        const { queries } = req.body;
+        console.log(queries);
+
+        timer = setInterval(sendData, 13000); // sends data every minute (60000)
 
         async function sendData() {
             // analyse the tweets
-            const emotions = await analyseTweets(data);
-            console.log(emotions);
+            let emotions = await analyseTweets(data);
+
+            emotions.query = queries;
+            // var currentDateTime = new Date(Date.now());
+            emotions.date = new Date(Date.now());
 
             // send to client
             res.write(JSON.stringify(emotions));
     
             // save to db
-            await new emotionModel({ query, emotions }).save();
+            await new emotionModel({ queries, emotions }).save();
     
             // flush data
             data = '';
         }
 
         var toSearch = {
-            track: [query],
+            track: [queries],
             language: 'en'
         }
         stream = T.stream('statuses/filter', toSearch );
@@ -76,10 +81,10 @@ router.post('/stream', function(req, res, next) {
         });
 
         setTimeout(function() {
-            clearInterval(myVar);
+            res.end();
+            clearInterval(timer);
             stream.stop(); // stops stream
             console.log("Stream closed");
-            res.end();
         }, 300000); // stops after 5 minutes
     } catch (err) {
         clearInterval(timer);
