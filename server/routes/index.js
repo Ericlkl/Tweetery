@@ -5,13 +5,13 @@ const { getTrends, getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
 const { getDataFromCache, saveDataToCache } = require('../services/cache');
-const { getEmotions } = require('../services/searchDatabase');
+const { getEmotions, getTrending } = require('../services/searchDatabase');
 const { analyseEndPointValidator } = require('../middlewares');
 
 const router = express.Router();
 
 // DB models
-var Trending = require('../services/storeTrends');
+var trendingModel = require('../services/storeTrends');
 var emotionModel = require('../services/storeEmotion');
 
 // @route  GET api/tweets/trends
@@ -19,36 +19,44 @@ var emotionModel = require('../services/storeEmotion');
 // @access Public
 router.get('/trends', async (req, res) => {
   try {
+
+    // Check if trends are stored on the cache
     const trendsInCache = await getDataFromCache('T:trends');
 
-    // If there are trends information saved in Cache
-    // Return it to client
-    // if (trendsInCache) return res.json(trendsInCache);
+    // Check if trends are stored on the db
+    const trendsInDb = await getTrending();
 
-    // Get trends data from Twitter
-    const trends = await getTrends();
+    // If trends is in the cache or db
+    if (trendsInCache) {
+      return res.json(trendsInCache);
+    } else if (trendsInDb){
+      // store in cache for 5 minutes
+      saveDataToCache('T:trends', 300, trendsInDb.trending[0].trends);
+      return res.json(trendsInDb);
+    } else {
+      // Get trends data from Twitter
+      const trends = await getTrends();
 
-    // Only Save Trends data in 5 minutes
-    // saveDataToCache('T:trends', 300, trends[0].trends);
+      // Save Trending data for five minutes
+      saveDataToCache('T:trends', 300, trends[0].trends);
 
-    // get today's date
-    // var today = new Date();
-    // var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      // store trends data in db
+      let t = new trendingModel();
 
-    // // store trends data in db
-    // let t = new Trending();
-    // t.tag.date = date;
-    // t.trending = trends;
-    // t.save(function(err) {
-    //   if (err) {
-    //     console.log('Error saving trend to DB: ', err);
-    //   } else {
-    //     console.log('Saved Trends to DB');
-    //   }
-    // })
+      var datetime = new Date(Date.now());
+      t.time = datetime;
+      t.trending = trends;
+      t.save(function(err) {
+        if (err) {
+          console.log('Error saving trend to DB: ', err);
+        } else {
+          console.log('Saved Trends to DB');
+        }
+      });
 
-    // Send Trends back to client
-    res.json(trends[0].trends);
+      // Send Trends back to client
+      res.json(trends[0].trends);
+    }
   } catch (err) {
     // Catch Block / Fail Case
     res.status(404).json({

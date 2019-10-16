@@ -1,9 +1,10 @@
 const express = require('express');
 var Twit = require('twit');
+var Twit = require('twit');
 
 const router = express.Router();
 
-const { analyseSentiment } = require('../scripts/processAnalysis');
+const { analyseTweets } = require('../scripts/processAnalysis');
 
 var T = new Twit({
     consumer_key: process.env.T_CONSUMER_KEY,
@@ -14,39 +15,31 @@ var T = new Twit({
     strictSSL: true // optional - requires SSL certificates to be valid.
   });  
 
-// Import twit library
-var Twit = require('twit');
-
 // DB models
-var sentimentModel = require('../services/storeSentiment');
+var emotionModel = require('../services/storeEmotion');
 
 let stream;
-let myVar;
+let timer;
 let data = '';
 
 router.post('/stream', function(req, res, next) {
     try {
         const query = req.body.query;
-        myVar = setInterval(myTimer, 10000);
+        timer = setInterval(sendData, 30000); // sends data every minute
 
-        async function myTimer() {
-            try {
-                // analyse the tweets
-                const sentiment = await analyseSentiment(data);
-                console.log(sentiment);
+        async function sendData() {
+            // analyse the tweets
+            const emotions = await analyseTweets(data);
+            console.log(emotions);
 
-                // send to client
-                res.write(JSON.stringify(sentiment));
-                // console.log(res);
-        
-                // save to db
-                await new sentimentModel({ query, sentiment }).save();
-        
-                // flush data
-                data = '';
-            } catch (err) {
-                return err;
-            }
+            // send to client
+            res.write(JSON.stringify(emotions));
+    
+            // save to db
+            await new emotionModel({ query, emotions }).save();
+    
+            // flush data
+            data = '';
         }
 
         var toSearch = {
@@ -87,10 +80,9 @@ router.post('/stream', function(req, res, next) {
             stream.stop(); // stops stream
             console.log("Stream closed");
             res.end();
-            // console.log(res.res);
-        }, 35000);
+        }, 300000); // stops after 5 minutes
     } catch (err) {
-        clearInterval(myVar);
+        clearInterval(timer);
         console.log("stream error: ", err);
         res.send("Stream error: ", err);
     }
@@ -99,11 +91,11 @@ router.post('/stream', function(req, res, next) {
 
 router.post('/stop', function(req, res, next){
     if (stream === undefined){
-        res.status(400).send({ Response: "There is no valid stream"})
+        res.status(400).send("No valid stream");
     } else {
         stream.stop();
-        clearInterval(myVar);
-        res.sendStatus(200);
+        clearInterval(timer);
+        res.status(200).send("Stream stopped");
     }    
 });
 

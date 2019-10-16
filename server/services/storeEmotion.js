@@ -4,7 +4,8 @@ var Schema = mongoose.Schema;
 
 var EmotionSchema = new Schema({
     "date": {
-        type: String
+        type: String,
+        default: null
     },
     "query": {
         type: String
