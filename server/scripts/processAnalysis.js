@@ -15,6 +15,11 @@ var nlu = new NaturalLanguageUnderstandingV1({
   url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
 });
 
+/**
+ * Analyse the emotion of the given tweets
+ * 
+ * @param {*} tweets - A string of tweets
+ */
 async function analyseTweets(tweets) {
   return new Promise((resolve, reject) => {
     // create object with values
@@ -37,6 +42,11 @@ async function analyseTweets(tweets) {
   });
 }
 
+/**
+ * Analyse the sentiment of the given tweets
+ * 
+ * @param {*} tweets - A string of tweets
+ */
 async function analyseSentiment(tweets) {
   return new Promise((resolve, reject) => {
     // create object with values

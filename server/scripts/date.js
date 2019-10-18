@@ -1,5 +1,8 @@
 const moment = require('moment');
 
+/**
+ * Generates the dates for the last seven days
+ */
 const getPassSevenDays = () => {
   const date = [];
   // Six day

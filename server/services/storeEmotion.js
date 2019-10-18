@@ -2,6 +2,9 @@ var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 
+/**
+ * Emotion Mongo schema for searching and storing in db
+ */
 var EmotionSchema = new Schema({
     "date": {
         type: String,

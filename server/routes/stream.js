@@ -31,6 +31,9 @@ router.post('/stream', function(req, res, next) {
         closeSocket = false;
         timer = setInterval(sendData, 60000); // sends data every minute (60000)
 
+        /**
+         * Transmits new data to the client. Executed every minute
+         */
         async function sendData() {
             console.log(closeSocket);
             if (closeSocket) {
@@ -75,6 +78,8 @@ router.post('/stream', function(req, res, next) {
 
         stream.on('disconnect', function(message) {
             console.log("Stream Disconnected: " + message);
+            closeSocket = true;
+            stream.stop();
         });
 
         stream.on('error', function(message) {

@@ -71,7 +71,6 @@ router.get('/trends', async (req, res) => {
 // @body   { queries: [] }
 router.post('/analyse', analyseEndPointValidator, async (req, res) => {
   // store the search query
-  // console.log(req);
   const { queries } = req.body;
   console.log(queries);
 
@@ -95,14 +94,7 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
             query,
             emotions: redisCacheData
           });
-          // To John:
-          // Disable this else if block to fix the analyse function
         } else if (db_emotions) {
-          // MongoDB is always return true
-          // Because the find method always find the emotion data by Date
-          // The Trump data is always be selected, because it exist a date it match pass7days
-          // Therefore, Raw data will never be analyse. it will always be using trump data
-          // But don't worry, I can fix it very quickly once the raw analyse function be fixed
           console.log('Data exists on mongodb');
           results.push(db_emotions);
 
@@ -112,7 +104,6 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
           console.log('Fetch The Raw data and save to cache and db');
           // Obtain tweets from given query
           const tweets = await getTweets(query, date);
-          // add errir handling for empty tweets
 
           // extract the tweets from the received JSON object
           const statuses = extractTweets(tweets.data.statuses);

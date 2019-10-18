@@ -1,6 +1,13 @@
 var emotionModel = require('./storeEmotion');
 var trendingModel = require('./storeTrends');
 
+/**
+ * Searches the emotional data from the database based
+ * on the date and the query
+ * 
+ * @param {*} Datekey - Date '2019-11-11'
+ * @param {*} queried - Search based on query e.g. 'trump'
+ */
 async function getEmotions(Datekey, queried) {
   return new Promise((resolve, reject) => {
     // let emotions = [];
@@ -18,6 +25,10 @@ async function getEmotions(Datekey, queried) {
   });
 }
 
+
+/**
+ * Gets the trending data between a certain date
+ */
 async function getTrending() {
   // Get start and end time, 15 minutes in between
   var startDate = new Date(Date.now() - 900000 * 60);

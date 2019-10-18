@@ -13,6 +13,12 @@ var T = new Twit({
   strictSSL: true // optional - requires SSL certificates to be valid.
 });
 
+/**
+ * Gets tweets based on the query and date
+ * 
+ * @param {*} query - search based on the query e.g. 'trump'
+ * @param {*} day - date '2019-11-11'
+ */
 async function getTweets(query, day) {
   return new Promise((resolve, reject) => {
     // Construct the search params
@@ -44,6 +50,9 @@ async function getTweets(query, day) {
   });
 }
 
+/**
+ * Gets the current trending topics from Twitter
+ */
 const getTrends = async () => {
   return new Promise((resolve, reject) => {
     const params = {
