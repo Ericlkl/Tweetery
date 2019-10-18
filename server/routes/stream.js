@@ -21,30 +21,38 @@ var emotionModel = require('../services/storeEmotion');
 let stream;
 let timer;
 let data = '';
+let closeSocket;
 
 router.post('/stream', function(req, res, next) {
     try {
         const { queries } = req.body;
         console.log(queries);
 
-        timer = setInterval(sendData, 13000); // sends data every minute (60000)
+        closeSocket = false;
+        timer = setInterval(sendData, 60000); // sends data every minute (60000)
 
         async function sendData() {
-            // analyse the tweets
-            let emotions = await analyseTweets(data);
+            console.log(closeSocket);
+            if (closeSocket) {
+                res.end();
+                clearInterval(timer);
+            } else {
+                // analyse the tweets
+                let emotions = await analyseTweets(data);
 
-            emotions.query = queries;
-            // var currentDateTime = new Date(Date.now());
-            emotions.date = new Date(Date.now());
+                emotions.query = queries;
+                // var currentDateTime = new Date(Date.now());
+                emotions.date = new Date(Date.now());
 
-            // send to client
-            res.write(JSON.stringify(emotions));
-    
-            // save to db
-            await new emotionModel({ queries, emotions }).save();
-    
-            // flush data
-            data = '';
+                // send to client
+                res.write(JSON.stringify(emotions));
+        
+                // save to db
+                await new emotionModel({ queries, emotions }).save();
+        
+                // flush data
+                data = '';
+            }
         }
 
         var toSearch = {
@@ -81,13 +89,15 @@ router.post('/stream', function(req, res, next) {
         });
 
         setTimeout(function() {
-            res.end();
             clearInterval(timer);
             stream.stop(); // stops stream
             console.log("Stream closed");
+            closeSocket = true;
         }, 300000); // stops after 5 minutes
     } catch (err) {
         clearInterval(timer);
+        res.end();
+        stream.stop();
         console.log("stream error: ", err);
         res.send("Stream error: ", err);
     }
@@ -99,7 +109,7 @@ router.post('/stop', function(req, res, next){
         res.status(400).send("No valid stream");
     } else {
         stream.stop();
-        clearInterval(timer);
+        closeSocket = true;
         res.status(200).send("Stream stopped");
     }    
 });
