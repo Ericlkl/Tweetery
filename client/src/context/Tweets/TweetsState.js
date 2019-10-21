@@ -158,7 +158,7 @@ const TweetsState = props => {
       const res = await axios.get('/api/tweets/trends');
       const values = _.remove(res.data, tweet => tweet.tweet_volume > 0).slice(
         0,
-        10
+        15
       );
 
       dispatch({

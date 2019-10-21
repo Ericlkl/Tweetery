@@ -24,6 +24,11 @@ let data = '';
 let closeSocket;
 
 router.post('/stream', function(req, res, next) {
+    if (stream !== undefined) {
+        stream.stop();
+        closeSocket = false;
+    }
+
     try {
         const { queries } = req.body;
         console.log(queries);
