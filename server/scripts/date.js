@@ -3,7 +3,7 @@ const moment = require('moment');
 /**
  * Generates the dates for the last seven days
  */
-const getPassSevenDays = () => {
+const getPastSevenDays = () => {
   const date = [];
   // Six day
   for (let i = 7; i > 0; i--) {
@@ -15,5 +15,5 @@ const getPassSevenDays = () => {
 };
 
 module.exports = {
-  getPassSevenDays
+  getPastSevenDays
 };

@@ -1,11 +1,17 @@
 const express = require('express');
 const { forEach } = require('p-iteration');
-const { getPassSevenDays } = require('../scripts/date');
+
+// Scripts
+const { getPastSevenDays } = require('../scripts/date');
 const { getTrends, getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
+const { sortData } = require('../scripts/sort');
+
+// Storage services
 const { getDataFromCache, saveDataToCache } = require('../services/cache');
 const { getEmotions, getTrending } = require('../services/searchDatabase');
+
 const { analyseEndPointValidator } = require('../middlewares');
 
 const router = express.Router();
@@ -77,7 +83,7 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
   var results = [];
 
   try {
-    await forEach(getPassSevenDays(), async date => {
+    await forEach(getPastSevenDays(), async date => {
       await forEach(queries, async query => {
         const redisKey = `${query}:${date}`;
 
@@ -121,8 +127,11 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
       });
     });
 
+    // sort json data from oldest to newest (Data not in order when retrieving from cache/db)
+    var sorted = sortData(results);
+
     // send json data
-    res.json(results);
+    res.json(sorted);
   } catch (err) {
     res.status(404).json({
       error: err
