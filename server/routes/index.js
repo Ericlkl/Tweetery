@@ -1,5 +1,6 @@
 const express = require('express');
 const { forEach } = require('p-iteration');
+const nlp = require('compromise');
 
 // Scripts
 const { getPastSevenDays } = require('../scripts/date');
@@ -113,9 +114,12 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
 
           // extract the tweets from the received JSON object
           const statuses = extractTweets(tweets.data.statuses);
+
+          // handle looseness & variety of random text
+          var doc = nlp(statuses).normalize().out('text');
           
           // Analyse the tweets
-          const emotions = await analyseTweets(statuses);
+          const emotions = await analyseTweets(doc);
 
           saveDataToCache(redisKey, 3600, emotions);
 
