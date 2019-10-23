@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.0",
+    "compromise": "^11.14.3",
     "config": "^3.2.2",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
