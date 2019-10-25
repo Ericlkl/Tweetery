@@ -1,8 +1,9 @@
 import React from 'react';
 import LineChart from './LineChart';
 import ChartControl from './ChartControl';
+import StreamControl from './StreamControl';
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, Typography } from '@material-ui/core';
+import { Paper, Typography, Grid } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,9 +18,18 @@ const Result = () => {
   return (
     <Paper className={classes.root}>
       {/* Section title */}
-      <Typography color='primary' variant='h5' component='h3'>
-        Result
-      </Typography>
+      <Grid container justify='space-between' alignItems='center'>
+        <Grid item xs={2}>
+          <Typography color='primary' variant='h5' component='h3'>
+            Result
+          </Typography>
+        </Grid>
+
+        <Grid item xs={2}>
+          <StreamControl />
+        </Grid>
+      </Grid>
+
       {/* Section Content */}
 
       <LineChart />

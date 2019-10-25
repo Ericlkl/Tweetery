@@ -6,12 +6,15 @@ const nlp = require('compromise');
 const { getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
+
 // Live Server Setting
-// Default - Broadcast time = 10Sec / REMOVE_UNUSED_QUERY_TIME = 10Sec
-//
-//
+// BROADCAST_TIME = The Period of time sending the emotion data to the client
+// REMOVE_UNUSED_QUERY_TIME = How many sec do the server wait and check the query
+// wheither subscribed by user or not. If the users is no-one used and be detected, remove immidiately
+// Default Broadcast time = 10Sec / REMOVE_UNUSED_QUERY_TIME = 1Min
+
 const BROADCAST_TIME = 10000;
-const REMOVE_UNUSED_QUERY_TIME = 10000;
+const REMOVE_UNUSED_QUERY_TIME = 60000;
 
 module.exports = (io, analysis) => {
   // Broadcasting Query message to each subscribtion

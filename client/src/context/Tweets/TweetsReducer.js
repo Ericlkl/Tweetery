@@ -7,7 +7,8 @@ import {
   FETCH_RESULT,
   FETCHING_RESULT,
   FETCH_TRENDING_TAGS,
-  SET_CHART_CONTROL
+  SET_CHART_CONTROL,
+  SWITCH_STREAM_MODE
 } from '../action';
 
 import _ from 'lodash';
@@ -73,6 +74,11 @@ export default (state, action) => {
         queries: state.queries.filter(tag => tag.id !== action.payload)
       };
 
+    case SWITCH_STREAM_MODE:
+      return {
+        ...state,
+        streamMode: action.payload
+      };
     case SET_CHART_CONTROL:
       return {
         ...state,

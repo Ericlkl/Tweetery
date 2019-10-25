@@ -8,7 +8,8 @@ import {
   FETCH_RESULT,
   FETCHING_RESULT,
   FETCH_TRENDING_TAGS,
-  SET_CHART_CONTROL
+  SET_CHART_CONTROL,
+  SWITCH_STREAM_MODE
 } from '../action';
 
 import axios from 'axios';
@@ -34,6 +35,7 @@ const initState = {
     isloading: false
   },
   chartControl: 'joy',
+  streamMode: false,
   messageBox: {
     type: 'error',
     content: 'Error ...',
@@ -205,6 +207,15 @@ const TweetsState = props => {
   const setChartControl = controlValue =>
     dispatch({ type: SET_CHART_CONTROL, payload: controlValue });
 
+  const switchStreamMode = () => {
+    dispatch({ type: SWITCH_STREAM_MODE, payload: !state.streamMode });
+    if (!state.streamMode) {
+      showMsgBox('Live Stream mode on!', 'success');
+    } else {
+      showMsgBox('Live Stream mode off!', 'success');
+    }
+  };
+
   // --------------------- Internal Actions -------------------------------
   const showMsgBox = (content, type) => {
     dispatch({ type: SHOW_MSG_BOX, payload: { content, type, show: true } });
@@ -220,12 +231,14 @@ const TweetsState = props => {
         result: state.result,
         chartControl: state.chartControl,
         messageBox: state.messageBox,
+        streamMode: state.streamMode,
         addTag,
         removeTag,
         fetchResult,
         fetchStream,
         updateQuery,
         setChartControl,
+        switchStreamMode,
         fetchTrendingTags,
         dismissMsgBox
       }}
