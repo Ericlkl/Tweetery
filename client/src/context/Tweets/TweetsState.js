@@ -116,8 +116,13 @@ const TweetsState = props => {
       // Map each query value to from an array only contains query keyword
       const queries = state.queries.map(query => query.value);
 
+      console.log('Socket Stream ');
+
       // Fetch Result Data from server
       const res = await axios.post('/api/tweets/stream', { queries });
+
+      console.log('Response Stream');
+      console.log(res);
 
       const values = {};
 
