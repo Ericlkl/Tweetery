@@ -19,8 +19,6 @@ const StreamControl = () => {
 
   const { switchStreamMode, streamMode } = useContext(TweetsContext);
 
-  console.log('Current Mode ' + streamMode);
-
   if (streamMode) {
     return (
       <Fab

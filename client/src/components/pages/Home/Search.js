@@ -70,8 +70,10 @@ const SearchField = ({ tag }) => {
   );
 };
 
-const SearchBtn = ({ addTag }) => {
-  const { fetchResult } = useContext(TweetsContext);
+const SearchBtn = () => {
+  const { addTag, streamMode, fetchResult, fetchStream } = useContext(
+    TweetsContext
+  );
 
   return (
     <Grid container spacing={2} justify='center'>
@@ -94,7 +96,7 @@ const SearchBtn = ({ addTag }) => {
           variant='extended'
           size='medium'
           aria-label='search'
-          onClick={fetchResult}
+          onClick={streamMode ? fetchStream : fetchResult}
         >
           <SearchIcon style={{ marginRight: '0.5rem' }} />
           Search
@@ -107,7 +109,7 @@ const SearchBtn = ({ addTag }) => {
 const Search = props => {
   const classes = useStyles();
 
-  const { queries, addTag } = useContext(TweetsContext);
+  const { queries } = useContext(TweetsContext);
 
   return (
     <Paper className={classes.root}>
@@ -118,7 +120,7 @@ const Search = props => {
       {queries.map(tag => (
         <SearchField tag={tag} key={tag.id} />
       ))}
-      <SearchBtn addTag={addTag} />
+      <SearchBtn />
     </Paper>
   );
 };

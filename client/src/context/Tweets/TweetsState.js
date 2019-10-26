@@ -7,6 +7,7 @@ import {
   UPDATE_QUERY,
   FETCH_RESULT,
   FETCHING_RESULT,
+  UPDATE_STREAM_DATA,
   FETCH_TRENDING_TAGS,
   SET_CHART_CONTROL,
   SWITCH_STREAM_MODE
@@ -14,6 +15,8 @@ import {
 
 import axios from 'axios';
 import _ from 'lodash';
+import moment from 'moment';
+import io from 'socket.io-client';
 import TweetsContext from './TweetsContext';
 import TweetsReducer from './TweetsReducer';
 import uuidv4 from 'uuid/v4';
@@ -31,7 +34,7 @@ const initState = {
     }
   ],
   result: {
-    values: [],
+    values: {},
     isloading: false
   },
   chartControl: 'joy',
@@ -68,7 +71,7 @@ const TweetsState = props => {
 
       const values = {};
 
-      /*  Convert Query data format
+      /*  Convert Query to data format like below
         {
           Pikachu : {
             Oct02 : { sadness: 0.2232 },
@@ -118,39 +121,22 @@ const TweetsState = props => {
       // Map each query value to from an array only contains query keyword
       const queries = state.queries.map(query => query.value);
 
-      console.log('Socket Stream ');
+      const stream = io.connect('/analysis');
 
-      // Fetch Result Data from server
-      const res = await axios.post('/api/tweets/stream', { queries });
-
-      console.log('Response Stream');
-      console.log(res);
-
-      const values = {};
-
-      /*  Convert Query data format
-        {
-          Pikachu : {
-            Oct02 : { sadness: 0.2232 },
-            Oct03 : {}
-          }
-        }
-      */
-
-      res.data.forEach(record => {
-        const { date, query, emotions } = record;
-        values[query] = {
-          ...values[query],
-          [date]: { ...emotions }
-        };
+      // Function That Server Send back
+      stream.on('serverMsg', data => {
+        console.log(data);
       });
 
-      dispatch({
-        type: FETCH_RESULT,
-        payload: { values, isloading: false }
-      });
+      // Join the channel that constantly receive data about the query
+      stream.emit('subscribe', queries);
 
-      showMsgBox('Result Generated Successfully ! ', 'success');
+      stream.on('subscriptionData', res => {
+        dispatch({
+          type: UPDATE_STREAM_DATA,
+          payload: res
+        });
+      });
     } catch (error) {
       showMsgBox('Fail to connect Server! Please Try again later ', 'error');
       dispatch({

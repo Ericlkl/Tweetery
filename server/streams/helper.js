@@ -13,8 +13,8 @@ const { analyseTweets } = require('../scripts/processAnalysis');
 // wheither subscribed by user or not. If the users is no-one used and be detected, remove immidiately
 // Default Broadcast time = 10Sec / REMOVE_UNUSED_QUERY_TIME = 1Min
 
-const BROADCAST_TIME = 10000;
-const REMOVE_UNUSED_QUERY_TIME = 60000;
+const BROADCAST_TIME = 5000;
+const REMOVE_UNUSED_QUERY_TIME = 5000;
 
 module.exports = (io, analysis) => {
   // Broadcasting Query message to each subscribtion
@@ -37,7 +37,7 @@ module.exports = (io, analysis) => {
 
       io.of('/analysis')
         .to(query)
-        .emit('dataFromServer', {
+        .emit('subscriptionData', {
           [query]: emotions
         });
     });

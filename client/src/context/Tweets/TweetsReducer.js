@@ -4,6 +4,7 @@ import {
   SHOW_MSG_BOX,
   DISMISS_MSG_BOX,
   UPDATE_QUERY,
+  UPDATE_STREAM_DATA,
   FETCH_RESULT,
   FETCHING_RESULT,
   FETCH_TRENDING_TAGS,
@@ -12,7 +13,7 @@ import {
 } from '../action';
 
 import _ from 'lodash';
-
+import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 
 export default (state, action) => {
@@ -21,6 +22,38 @@ export default (state, action) => {
       return {
         ...state,
         trends: action.payload
+      };
+
+    case UPDATE_STREAM_DATA:
+      const updateQuery = Object.keys(action.payload)[0];
+      const currentTime = moment(Date.now()).format('HH:mm:ss');
+
+      console.log('Previous State');
+      console.log(state.result.values[updateQuery]);
+
+      const values = {
+        ...state.result.values,
+        [updateQuery]: {
+          ...state.result.values[updateQuery],
+          [currentTime]: action.payload[updateQuery]
+        }
+      };
+
+      console.log('Values');
+      console.log(values);
+
+      return {
+        ...state,
+        result: {
+          values: {
+            ...state.result.values,
+            [updateQuery]: {
+              ...state.result.values[updateQuery],
+              [currentTime]: action.payload[updateQuery]
+            }
+          },
+          isloading: false
+        }
       };
 
     case FETCH_RESULT:
@@ -77,6 +110,10 @@ export default (state, action) => {
     case SWITCH_STREAM_MODE:
       return {
         ...state,
+        result: {
+          values: {},
+          isloading: false
+        },
         streamMode: action.payload
       };
     case SET_CHART_CONTROL:
@@ -90,7 +127,7 @@ export default (state, action) => {
         ...state,
         result: {
           isloading: true,
-          values: []
+          values: {}
         }
       };
     case SHOW_MSG_BOX:

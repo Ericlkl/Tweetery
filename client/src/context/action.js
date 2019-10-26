@@ -1,6 +1,7 @@
 export const FETCH_TRENDING_TAGS = 'FETCH_TRENDING_TAGS';
 export const FETCHING_RESULT = 'FETCHING_RESULT';
 export const FETCH_RESULT = 'FETCH_RESULT';
+export const UPDATE_STREAM_DATA = 'UPDATE_STREAM_DATA';
 export const ADD_TAG = 'ADD_QUERY_TAG';
 export const REMOVE_TAG = 'REMOVE_TAG';
 export const UPDATE_QUERY = 'UPDATE_QUERY';

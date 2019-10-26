@@ -5,6 +5,7 @@ module.exports = expressServer => {
   // NameSpace
   io.of('/analysis').on('connection', socket => {
     // Connect Successfully
+    io.of('/analysis').emit('serverMsg', 'Server Connect Successfully');
 
     socket.on('subscribe', queries => {
       // Looping through all the queries
