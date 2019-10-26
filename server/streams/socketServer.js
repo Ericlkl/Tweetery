@@ -14,7 +14,7 @@ const { analyseTweets } = require('../scripts/processAnalysis');
 // wheither subscribed by user or not. If the users is no-one used and be detected, remove immidiately
 // Default Broadcast time = 5Sec / REMOVE_UNUSED_QUERY_TIME = 60Min
 
-const BROADCAST_TIME = 5000;
+const BROADCAST_TIME = 10000;
 const REMOVE_UNUSED_QUERY_TIME = 60000;
 
 module.exports = expressServer => {
@@ -69,7 +69,8 @@ module.exports = expressServer => {
 
       // Analyse the tweets
       const emotions = await analyseTweets(doc);
-      const currentTime = moment(Date.now()).format('HH:mm:ss');
+      let currentTime = moment(Date.now()).format('HH:mm:ss');
+      currentTime = currentTime.slice(0, -1) + '0';
 
       console.log(`Sending Broadcast for ${query}`);
 
