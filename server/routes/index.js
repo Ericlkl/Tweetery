@@ -26,7 +26,6 @@ var emotionModel = require('../services/storeEmotion');
 // @access Public
 router.get('/trends', async (req, res) => {
   try {
-
     // Check if trends are stored on the cache
     const trendsInCache = await getDataFromCache('T:trends');
 
@@ -36,7 +35,7 @@ router.get('/trends', async (req, res) => {
     // If trends is in the cache or db
     if (trendsInCache) {
       return res.json(trendsInCache);
-    } else if (trendsInDb){
+    } else if (trendsInDb) {
       // store in cache for 5 minutes
       saveDataToCache('T:trends', 300, trendsInDb.trending[0].trends);
       return res.json(trendsInDb);
@@ -116,8 +115,10 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
           const statuses = extractTweets(tweets.data.statuses);
 
           // handle looseness & variety of random text
-          var doc = nlp(statuses).normalize().out('text');
-          
+          var doc = nlp(statuses)
+            .normalize()
+            .out('text');
+
           // Analyse the tweets
           const emotions = await analyseTweets(doc);
 
@@ -134,8 +135,27 @@ router.post('/analyse', analyseEndPointValidator, async (req, res) => {
     // sort json data from oldest to newest (Data not in order when retrieving from cache/db)
     var sorted = sortData(results);
 
+    const response = {};
+
+    // /*  Convert Query to data format like below
+    //   {
+    //     Pikachu : {
+    //       Oct02 : { sadness: 0.2232 },
+    //       Oct03 : {}
+    //     }
+    //   }
+    // */
+
+    sorted.forEach(record => {
+      const { date, query, emotions } = record;
+      response[query] = {
+        ...response[query],
+        [date]: emotions
+      };
+    });
+
     // send json data
-    res.json(sorted);
+    res.json(response);
   } catch (err) {
     res.status(404).json({
       error: err

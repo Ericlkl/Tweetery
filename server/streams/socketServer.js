@@ -12,6 +12,7 @@ module.exports = expressServer => {
       queries.forEach(query => {
         // If the real time analysis is tracking this query already
         if (analysis.includes(query)) {
+          io.of('/analysis').emit('serverMsg', `New Memeber Joined ${query}`);
           // Join the susbscribion for query
           socket.join(query);
         } else {
@@ -19,6 +20,7 @@ module.exports = expressServer => {
           analysis.push(query);
           // Client Subscribe to this query
           socket.join(query);
+          io.of('/analysis').emit('serverMsg', `A new Member created ${query}`);
         }
       });
     });

@@ -34,11 +34,14 @@ module.exports = (io, analysis) => {
 
       // Analyse the tweets
       const emotions = await analyseTweets(doc);
+      const currentTime = moment(Date.now()).format('HH:mm:ss');
 
       io.of('/analysis')
         .to(query)
         .emit('subscriptionData', {
-          [query]: emotions
+          [query]: {
+            [currentTime]: emotions
+          }
         });
     });
   }, BROADCAST_TIME);

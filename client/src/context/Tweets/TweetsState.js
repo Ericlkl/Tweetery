@@ -15,7 +15,6 @@ import {
 
 import axios from 'axios';
 import _ from 'lodash';
-import moment from 'moment';
 import io from 'socket.io-client';
 import TweetsContext from './TweetsContext';
 import TweetsReducer from './TweetsReducer';
@@ -35,7 +34,8 @@ const initState = {
   ],
   result: {
     values: {},
-    isloading: false
+    isloading: false,
+    subscribing: []
   },
   chartControl: 'joy',
   streamMode: false,
@@ -46,10 +46,23 @@ const initState = {
   }
 };
 
+// Socket.io
+const stream = io.connect('http://localhost:5000/analysis', { forceNew: true });
+
+// Function That Socket io Server send back
+stream.on('serverMsg', data => {
+  console.log(data);
+});
+
 const TweetsState = props => {
   const [state, dispatch] = useReducer(TweetsReducer, initState);
 
   const fetchResult = async () => {
+    // Unsubscribe the Stream, it keeps the static function
+    // will not receive the real time data
+    unsubscribeStream();
+
+    // Checking the first query is not empty
     if (state.queries[0].value.length === 0) {
       return showMsgBox(
         'First query can not be Empty ! Please insert the keyword for first query!',
@@ -69,28 +82,10 @@ const TweetsState = props => {
       // Fetch Result Data from server
       const res = await axios.post('/api/tweets/analyse', { queries });
 
-      const values = {};
-
-      /*  Convert Query to data format like below
-        {
-          Pikachu : {
-            Oct02 : { sadness: 0.2232 },
-            Oct03 : {}
-          }
-        }
-      */
-
-      res.data.forEach(record => {
-        const { date, query, emotions } = record;
-        values[query] = {
-          ...values[query],
-          [date]: { ...emotions }
-        };
-      });
-
+      // Updata react state when the result came back
       dispatch({
         type: FETCH_RESULT,
-        payload: { values, isloading: false }
+        payload: res.data
       });
 
       showMsgBox('Result Generated Successfully ! ', 'success');
@@ -105,6 +100,9 @@ const TweetsState = props => {
 
   // To start streaming data
   const fetchStream = async () => {
+    // Unsubscribe the previous Stream, it keeps the next query accurate
+    unsubscribeStream();
+
     if (state.queries[0].value.length === 0) {
       return showMsgBox(
         'First query can not be Empty ! Please insert the keyword for first query!',
@@ -120,13 +118,6 @@ const TweetsState = props => {
 
       // Map each query value to from an array only contains query keyword
       const queries = state.queries.map(query => query.value);
-
-      const stream = io.connect('/analysis');
-
-      // Function That Server Send back
-      stream.on('serverMsg', data => {
-        console.log(data);
-      });
 
       // Join the channel that constantly receive data about the query
       stream.emit('subscribe', queries);
@@ -145,6 +136,9 @@ const TweetsState = props => {
       });
     }
   };
+
+  const unsubscribeStream = () =>
+    stream.emit('unsubscribe', state.result.subscribing);
 
   const fetchTrendingTags = async () => {
     try {
@@ -194,6 +188,9 @@ const TweetsState = props => {
     dispatch({ type: SET_CHART_CONTROL, payload: controlValue });
 
   const switchStreamMode = () => {
+    // Ubsubscribe the stream when user switch the query mode
+    unsubscribeStream();
+
     dispatch({ type: SWITCH_STREAM_MODE, payload: !state.streamMode });
     if (!state.streamMode) {
       showMsgBox('Live Stream mode on!', 'success');

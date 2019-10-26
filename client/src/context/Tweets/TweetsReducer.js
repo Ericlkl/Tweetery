@@ -13,7 +13,6 @@ import {
 } from '../action';
 
 import _ from 'lodash';
-import moment from 'moment';
 import uuidv4 from 'uuid/v4';
 
 export default (state, action) => {
@@ -26,40 +25,32 @@ export default (state, action) => {
 
     case UPDATE_STREAM_DATA:
       const updateQuery = Object.keys(action.payload)[0];
-      const currentTime = moment(Date.now()).format('HH:mm:ss');
-
-      console.log('Previous State');
-      console.log(state.result.values[updateQuery]);
 
       const values = {
         ...state.result.values,
-        [updateQuery]: {
+        [updateQuery]: _.pickBy({
           ...state.result.values[updateQuery],
-          [currentTime]: action.payload[updateQuery]
-        }
+          ...action.payload[updateQuery]
+        })
       };
-
-      console.log('Values');
-      console.log(values);
 
       return {
         ...state,
         result: {
-          values: {
-            ...state.result.values,
-            [updateQuery]: {
-              ...state.result.values[updateQuery],
-              [currentTime]: action.payload[updateQuery]
-            }
-          },
-          isloading: false
+          values,
+          isloading: false,
+          subscribing: Object.keys(state.result.values)
         }
       };
 
     case FETCH_RESULT:
       return {
         ...state,
-        result: action.payload
+        result: {
+          values: action.payload,
+          isloading: false,
+          subscribing: []
+        }
       };
 
     case UPDATE_QUERY:
@@ -112,7 +103,8 @@ export default (state, action) => {
         ...state,
         result: {
           values: {},
-          isloading: false
+          isloading: false,
+          subscribing: []
         },
         streamMode: action.payload
       };
@@ -127,7 +119,8 @@ export default (state, action) => {
         ...state,
         result: {
           isloading: true,
-          values: {}
+          values: {},
+          subscribing: []
         }
       };
     case SHOW_MSG_BOX:
