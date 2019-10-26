@@ -46,7 +46,6 @@ const Suggestion = () => {
   const { values, isloading } = trends;
   // componentDidMount
   useEffect(() => {
-    // Not Working Yet, Waiting for server setting up
     fetchTrendingTags();
 
     // eslint-disable-next-line

@@ -56,8 +56,6 @@ const LineChart = () => {
   const datasets = Object.keys(result.values).map((query, i) => {
     // Extract all Date name and loop through it
     const value = Object.keys(result.values[query]).map(date => {
-      console.log('Date before Xlabels');
-      console.log(date);
       xlabels.push(date);
       return result.values[query][date][chartControl];
     });
