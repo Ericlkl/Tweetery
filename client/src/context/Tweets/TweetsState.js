@@ -58,10 +58,6 @@ const TweetsState = props => {
   const [state, dispatch] = useReducer(TweetsReducer, initState);
 
   const fetchResult = async () => {
-    // Unsubscribe the Stream, it keeps the static function
-    // will not receive the real time data
-    unsubscribeStream();
-
     // Checking the first query is not empty
     if (state.queries[0].value.length === 0) {
       return showMsgBox(
@@ -100,9 +96,6 @@ const TweetsState = props => {
 
   // To start streaming data
   const fetchStream = async () => {
-    // Unsubscribe the previous Stream, it keeps the next query accurate
-    unsubscribeStream();
-
     if (state.queries[0].value.length === 0) {
       return showMsgBox(
         'First query can not be Empty ! Please insert the keyword for first query!',
@@ -223,7 +216,8 @@ const TweetsState = props => {
         setChartControl,
         switchStreamMode,
         fetchTrendingTags,
-        dismissMsgBox
+        dismissMsgBox,
+        unsubscribeStream
       }}
     >
       {props.children}

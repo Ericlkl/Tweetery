@@ -71,9 +71,22 @@ const SearchField = ({ tag }) => {
 };
 
 const SearchBtn = () => {
-  const { addTag, streamMode, fetchResult, fetchStream } = useContext(
-    TweetsContext
-  );
+  const {
+    addTag,
+    streamMode,
+    fetchResult,
+    fetchStream,
+    unsubscribeStream
+  } = useContext(TweetsContext);
+
+  const streaming = () => {
+    // We need to give sometime for server kicking out the user
+    unsubscribeStream();
+
+    setTimeout(() => {
+      fetchStream();
+    }, 1000);
+  };
 
   return (
     <Grid container spacing={2} justify='center'>
@@ -96,7 +109,7 @@ const SearchBtn = () => {
           variant='extended'
           size='medium'
           aria-label='search'
-          onClick={streamMode ? fetchStream : fetchResult}
+          onClick={streamMode ? streaming : fetchResult}
         >
           <SearchIcon style={{ marginRight: '0.5rem' }} />
           Search
