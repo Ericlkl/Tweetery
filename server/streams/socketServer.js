@@ -5,8 +5,8 @@ var data = '';
 const _ = require('lodash');
 const moment = require('moment');
 const Twit = require('twit');
-
 const nlp = require('compromise');
+
 const { getTweets } = require('../scripts/processTweets');
 const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
@@ -37,11 +37,11 @@ async function startStream(queries) {
       language: 'en'
     };
 
+    // Start stream
     stream = T.stream('statuses/filter', toSearch);
     console.log('Tracking: ' + toSearch.track);
-    // turn on stream
+
     stream.on('message', function (message) {
-      // console.log(message.created_at, message.text + '\n');
       data += message.text + '\n';
     });
 
@@ -72,8 +72,12 @@ async function startStream(queries) {
 }
 
 module.exports = expressServer => {
+  try {
+
+  } catch (err) {
+    console.log(err);
+  }
   const io = require('socket.io')(expressServer);
-  // NameSpace
   io.of('/analysis').on('connection', socket => {
     // Connect Successfully
     io.of('/analysis').emit('serverMsg', 'Server Connect Successfully');
@@ -81,13 +85,11 @@ module.exports = expressServer => {
     socket.on('subscribe', queries => {
       startStream(queries);
 
-        analysis = queries;
-        console.log(analysis, queries);
-        // Client Subscribe to this query
-        socket.join(queries);
-        io.of('/analysis').emit('serverMsg', `A new Member created ${queries}`);
-      // }
-      // });
+      analysis = queries;
+      console.log(analysis, queries);
+      // Client Subscribe to this query
+      socket.join(queries);
+      io.of('/analysis').emit('serverMsg', `A new Member created ${queries}`);
     });
 
     // Trigger when client side say disconnect
@@ -100,41 +102,39 @@ module.exports = expressServer => {
   });
 
   // Socket.io Helper functions
-  // Broadcasting Query message to each subscribtion
+  // Broadcasting Query message to subscribtion
   var broadcastInverval = setInterval(async () => {
 
+    try {
+      // handle looseness & variety of random text
+      var doc = await nlp(data)
+        .normalize()
+        .out('text');
 
-    // handle looseness & variety of random text
-    var doc = await nlp(data)
-      .normalize()
-      .out('text');
-    // console.log(doc);
+      // Analyse the tweets
+      const emotions = await analyseTweets(doc);
+      let currentTime = moment(Date.now()).format('HH:mm:ss');
+      currentTime = currentTime.slice(0, -1) + '0';
 
-    // Analyse the tweets
-    const emotions = await analyseTweets(doc);
-    let currentTime = moment(Date.now()).format('HH:mm:ss');
-    currentTime = currentTime.slice(0, -1) + '0';
+      // console.log(`Sending Broadcast`, emotions);
 
-    // console.log(`Sending Broadcast`, emotions);
+      io.of('/analysis')
+        .to(analysis)
+        .emit('subscriptionData', {
+          [analysis]: {
+            [currentTime]: emotions
+          }
+        });
 
-    io.of('/analysis')
-      .to(analysis)
-      .emit('subscriptionData', {
-        [analysis]: {
-          [currentTime]: emotions
-        }
-      });
-
-    data = '';
+      data = '';
+    } catch (err) {
+      console.log("No content provided for stream to start");
+    }
   }, BROADCAST_TIME);
 
   // Check if no one is connected for the stream
   // if no one is connected, close the stream and socket
   var checkerInverval = setInterval(() => {
-    // analysis.forEach(query => {
-      // If there no one user in the room(Socket.io terms)
-      // It means no one tracking this query
-      // Remove it from the update list
     io.of('/analysis')
       .in(analysis)
       .clients((error, clients) => {
@@ -142,19 +142,18 @@ module.exports = expressServer => {
         console.log(`${clients.length} Connected Users searching: ${analysis}`);
         data = '';
         if (clients.length === 0) {
+          console.log("Closing Stream");
           analysis = _.without(analysis, analysis);
           data = '';
-          if (stream !== undefined){
+          if (stream !== undefined) {
             stream.stop();
           }
           clearInterval(broadcastInverval);
           clearInterval(checkerInverval);
         }
       });
-    // });
     console.log('------------- Socket.io -----------------');
     console.log('Tracking Items : ');
     console.log(analysis);
   }, REMOVE_UNUSED_QUERY_TIME);
 }
-// };
