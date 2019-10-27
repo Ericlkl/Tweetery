@@ -4,7 +4,6 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 
 const indexRouter = require('./routes/index');
-const streamRouter = require('./routes/stream');
 const { pageNotFoundHandler, errorHandler } = require('./middlewares');
 // Load the enviroment variables
 require('dotenv').config();
@@ -35,12 +34,11 @@ try {
     console.log('Connection to MongoDB successful');
   });
 } catch (err) {
-  console.log("Mongoose connection error: ", err);
+  console.log('Mongoose connection error: ', err);
 }
 
 // API Routes
 app.use('/api/tweets/', indexRouter);
-app.use('/api/tweets/', streamRouter);
 
 // Serving Front End Website
 // Making the unused HTTP routes for returning webpage

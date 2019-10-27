@@ -49,7 +49,10 @@ const initState = {
 // Socket.io
 // Localhost deployment: http://localhost:5000/analysis
 // ip for remote server http://cab432-a2-2021882916.ap-southeast-2.elb.amazonaws.com/analysis
-const stream = io.connect('http://localhost:5000/analysis', { forceNew: true, transports: ['websocket']});
+const stream = io.connect('http://localhost:5000/analysis', {
+  forceNew: true,
+  transports: ['websocket']
+});
 
 // Function That Socket io Server send back
 stream.on('serverMsg', data => {
@@ -138,6 +141,8 @@ const TweetsState = props => {
   const fetchTrendingTags = async () => {
     try {
       const res = await axios.get('/api/tweets/trends');
+      console.log('Trending');
+      console.log(res.data);
       const values = _.remove(res.data, tweet => tweet.tweet_volume > 0);
 
       dispatch({

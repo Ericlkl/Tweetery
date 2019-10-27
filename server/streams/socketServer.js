@@ -30,7 +30,6 @@ const BROADCAST_TIME = 10000;
 const REMOVE_UNUSED_QUERY_TIME = 60000;
 
 async function startStream(queries) {
-
   try {
     var toSearch = {
       track: queries,
@@ -41,26 +40,26 @@ async function startStream(queries) {
     stream = T.stream('statuses/filter', toSearch);
     console.log('Tracking: ' + toSearch.track);
 
-    stream.on('message', function (message) {
+    stream.on('message', function(message) {
       data += message.text + '\n';
     });
 
     //Check limit
-    stream.on('limit', function (message) {
+    stream.on('limit', function(message) {
       console.log('Limit Reached: ' + message);
     });
 
-    stream.on('disconnect', function (message) {
+    stream.on('disconnect', function(message) {
       console.log('Stream Disconnected: ' + message);
       closeSocket = true;
       stream.stop();
     });
 
-    stream.on('error', function (message) {
+    stream.on('error', function(message) {
       console.log('Stream error: ' + message);
     });
 
-    stream.on('reconnect', function (request, response, connectInterval) {
+    stream.on('reconnect', function(request, response, connectInterval) {
       console.log('Attempting to reconnect');
       if (response) {
         console.log('Connection result: ' + response);
@@ -73,7 +72,6 @@ async function startStream(queries) {
 
 module.exports = expressServer => {
   try {
-
   } catch (err) {
     console.log(err);
   }
@@ -105,7 +103,6 @@ module.exports = expressServer => {
   // Socket.io Helper functions
   // Broadcasting Query message to subscribtion
   var broadcastInverval = setInterval(async () => {
-
     try {
       // handle looseness & variety of random text
       var doc = await nlp(data)
@@ -113,7 +110,7 @@ module.exports = expressServer => {
         .out('text');
 
       // Analyse the tweets
-      if (doc !== undefined){
+      if (doc !== undefined) {
         const emotions = await analyseTweets(doc);
         let currentTime = moment(Date.now()).format('HH:mm:ss');
         currentTime = currentTime.slice(0, -1) + '0';
@@ -128,11 +125,13 @@ module.exports = expressServer => {
             }
           });
       }
-      
 
       data = '';
     } catch (err) {
-      console.log("No data for analysis");
+      console.log('No data for analysis');
+      io.of('/analysis')
+        .to(analysis)
+        .emit('serverMsg', `No data for ${analysis}`);
     }
   }, BROADCAST_TIME);
 
@@ -146,7 +145,7 @@ module.exports = expressServer => {
         console.log(`${clients.length} Connected Users searching: ${analysis}`);
         data = '';
         if (clients.length === 0) {
-          console.log("Closing Stream");
+          console.log('Closing Stream');
           analysis = _.without(analysis, analysis);
           data = '';
           if (stream !== undefined) {
@@ -160,4 +159,4 @@ module.exports = expressServer => {
     console.log('Tracking Items : ');
     console.log(analysis);
   }, REMOVE_UNUSED_QUERY_TIME);
-}
+};
