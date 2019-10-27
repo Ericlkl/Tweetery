@@ -1,5 +1,3 @@
-var channels = [];
-
 const _ = require('lodash');
 const moment = require('moment');
 const nlp = require('compromise');
@@ -14,7 +12,13 @@ const TwitStream = require('../model/TwitStream');
 // Default Broadcast time = 5Sec / REMOVE_UNUSED_QUERY_TIME = 60Min
 
 const BROADCAST_TIME = 10000;
-const REMOVE_UNUSED_QUERY_TIME = 40000;
+const REMOVE_UNUSED_QUERY_TIME = 60000;
+
+// Dont rename this variable
+// This variable plays a big role in the socket io
+// It saved all the channels running at the socket io server
+// We used it to broasdcast the emotion data to users
+var channels = [];
 
 module.exports = expressServer => {
   try {
@@ -31,46 +35,51 @@ module.exports = expressServer => {
     io.of('/analysis').emit('serverMsg', 'Server Connect Successfully');
 
     socket.on('subscribe', queries => {
-      let newChannel = { name: '' };
-      queries.forEach(query => (newChannel.name += _.trim(query) + ' '));
+      // Checking every query from the user provied
+      queries.forEach(query => {
+        // If the query already generated as a channel
+        const isExist = channels.some(channel => {
+          console.log(`Checking channels name ${query}`);
+          if (channel.name === query) {
+            // assign the user in the same channel like the previous user
+            // So that they can recevie the same real time data
+            // Each channel is related to one specific topic by the query name
+            socket.join(channel.name);
+            // Broadcast the message, so that People knows they entered to the room
+            io.of('/analysis')
+              .to(channel.name)
+              .emit(
+                'serverMsg',
+                `A Member joined existed channel ${channel.name}`
+              );
+          }
+          return channel.name === query;
+        });
 
-      const isExist = channels.some(channel => {
-        console.log(`Checking channels name ${channel.name}`);
-        if (channel.name === newChannel.name) {
-          socket.join(channel.name);
-          io.of('/analysis').emit(
-            'serverMsg',
-            `A Member joined existed channel ${channel.name}`
-          );
+        // If there is no channel , create a new one to user
+        if (!isExist) {
+          // Put new channel information to channels array
+          channels.push({
+            name: query,
+            stream: new TwitStream(query)
+          });
+          // Assign user into the new Channel
+          socket.join(query);
+
+          // Client Subscribe to this query
+          io.of('/analysis').emit('serverMsg', `A new Member created ${query}`);
         }
-        return channel.name === newChannel.name;
       });
-
-      // If there is no channel do the samething like this one
-      if (!isExist) {
-        // Create new Twit Stream for new channels
-        newChannel.stream = new TwitStream(queries, newChannel.name);
-        // Put new channel information to channels array
-        channels.push(newChannel);
-        // Assign user into the new Channel
-        socket.join(newChannel.name);
-
-        // Client Subscribe to this query
-        io.of('/analysis').emit(
-          'serverMsg',
-          `A new Member created ${newChannel.name}`
-        );
-      }
     });
 
-    // Trigger when client side say disconnect
+    // Trigger when client want to unsubscribe the previous queries
     socket.on('unsubscribe', queries => {
-      let channelName = '';
-      queries.forEach(query => (channelName += _.trim(query) + ' '));
-
-      socket.leave(channelName);
-      // Client unSubscribe to this query
-      io.of('/analysis').emit('serverMsg', `A Member leaved ${channelName}`);
+      queries.forEach(query => {
+        // Unsubscribe
+        socket.leave(query);
+        // Client unSubscribe to this query
+        io.of('/analysis').emit('serverMsg', `A Member leaved ${query}`);
+      });
     });
   });
 
@@ -87,8 +96,10 @@ module.exports = expressServer => {
         // Analyse the tweets
         if (doc !== undefined) {
           const emotions = await analyseTweets(doc);
-          let currentTime = moment(Date.now()).format('HH:mm:ss');
-          currentTime = currentTime.slice(0, -1) + '0';
+          const currentTime =
+            moment(Date.now())
+              .format('HH:mm:ss')
+              .slice(0, -1) + '0';
 
           // console.log(`Sending Broadcast`, emotions);
 
@@ -103,8 +114,6 @@ module.exports = expressServer => {
 
         channel.stream.data = '';
       } catch (err) {
-        console.log('Error Msg');
-        console.log(err);
         console.log(`No data for ${channel.name}`);
         io.of('/analysis')
           .to(channel.name)
@@ -127,16 +136,21 @@ module.exports = expressServer => {
             `${clients.length} Connected Users searching: ${channel.name}`
           );
           if (clients.length === 0) {
+            // If no one subscribe the channel anymore
+            // Stop the Twit stream
             channel.stream.stop();
+            // Push this channel into remove list
             channelRemoveList.push(channel.name);
           }
         });
     });
 
+    // Remove the channels according the filter list generated above
     channels = await channels.filter(
       channel => !channelRemoveList.includes(channel.name)
     );
 
+    // Print the Tracking Channels
     console.log('------------- Socket.io -----------------');
     console.log('Tracking Items : ');
     console.log(channels.map(channel => channel.name));

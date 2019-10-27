@@ -12,18 +12,18 @@ const T = new Twit({
 });
 
 class TwitStream {
-  constructor(queries, queryName) {
+  constructor(query) {
     this.data = '';
-    this.queryName = queryName;
+    this.query = query;
     this.stream = T.stream('statuses/filter', {
-      track: queries,
+      track: query,
       language: 'en'
     });
 
     try {
       // Start stream
 
-      console.log('Tracking: ' + queryName);
+      console.log('Tracking: ' + query);
 
       // If new tweets found
       this.stream.on('message', message => {
@@ -60,7 +60,7 @@ class TwitStream {
 
   stop() {
     this.stream.stop();
-    console.log(`${this.queryName} Stream stoped`);
+    console.log(`${this.query} Stream stoped`);
   }
 }
 
