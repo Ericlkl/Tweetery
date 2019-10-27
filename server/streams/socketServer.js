@@ -1,24 +1,9 @@
-let analysis;
-let stream;
-var data = '';
-
 const _ = require('lodash');
 const moment = require('moment');
-const Twit = require('twit');
 const nlp = require('compromise');
 
-const { getTweets } = require('../scripts/processTweets');
-const { extractTweets } = require('../scripts/extract');
 const { analyseTweets } = require('../scripts/processAnalysis');
-
-var T = new Twit({
-  consumer_key: process.env.T_CONSUMER_KEY,
-  consumer_secret: process.env.T_CONSUMER_SECRET,
-  access_token: process.env.T_ACCESS_TOKEN_KEY,
-  access_token_secret: process.env.T_ACCESS_TOKEN_SECRET,
-  timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-  strictSSL: true // optional - requires SSL certificates to be valid.
-});
+const TwitStream = require('../model/TwitStream');
 
 // Live Server Setting
 // BROADCAST_TIME = The Period of time sending the emotion data to the client
@@ -29,134 +14,145 @@ var T = new Twit({
 const BROADCAST_TIME = 10000;
 const REMOVE_UNUSED_QUERY_TIME = 60000;
 
-async function startStream(queries) {
-  try {
-    var toSearch = {
-      track: queries,
-      language: 'en'
-    };
-
-    // Start stream
-    stream = T.stream('statuses/filter', toSearch);
-    console.log('Tracking: ' + toSearch.track);
-
-    stream.on('message', function(message) {
-      data += message.text + '\n';
-    });
-
-    //Check limit
-    stream.on('limit', function(message) {
-      console.log('Limit Reached: ' + message);
-    });
-
-    stream.on('disconnect', function(message) {
-      console.log('Stream Disconnected: ' + message);
-      closeSocket = true;
-      stream.stop();
-    });
-
-    stream.on('error', function(message) {
-      console.log('Stream error: ' + message);
-    });
-
-    stream.on('reconnect', function(request, response, connectInterval) {
-      console.log('Attempting to reconnect');
-      if (response) {
-        console.log('Connection result: ' + response);
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
+// Dont rename this variable
+// This variable plays a big role in the socket io
+// It saved all the channels running at the socket io server
+// We used it to broasdcast the emotion data to users
+var channels = [];
 
 module.exports = expressServer => {
   try {
   } catch (err) {
     console.log(err);
   }
+  // Initialize Socket.io Apps
   const io = require('socket.io')(expressServer);
   io.set('origins', '*:*');
+
+  // Create new namespace for emotion analysis
   io.of('/analysis').on('connection', socket => {
     // Connect Successfully
     io.of('/analysis').emit('serverMsg', 'Server Connect Successfully');
 
     socket.on('subscribe', queries => {
-      startStream(queries);
+      // Checking every query from the user provied
+      queries.forEach(query => {
+        // If the query already generated as a channel
+        const isExist = channels.some(channel => {
+          console.log(`Checking channels name ${query}`);
+          if (channel.name === query) {
+            // assign the user in the same channel like the previous user
+            // So that they can recevie the same real time data
+            // Each channel is related to one specific topic by the query name
+            socket.join(channel.name);
+            // Broadcast the message, so that People knows they entered to the room
+            io.of('/analysis')
+              .to(channel.name)
+              .emit(
+                'serverMsg',
+                `A Member joined existed channel ${channel.name}`
+              );
+          }
+          return channel.name === query;
+        });
 
-      analysis = queries;
-      console.log(analysis, queries);
-      // Client Subscribe to this query
-      socket.join(queries);
-      io.of('/analysis').emit('serverMsg', `A new Member created ${queries}`);
+        // If there is no channel , create a new one to user
+        if (!isExist) {
+          // Put new channel information to channels array
+          channels.push({
+            name: query,
+            stream: new TwitStream(query)
+          });
+          // Assign user into the new Channel
+          socket.join(query);
+
+          // Client Subscribe to this query
+          io.of('/analysis').emit('serverMsg', `A new Member created ${query}`);
+        }
+      });
     });
 
-    // Trigger when client side say disconnect
+    // Trigger when client want to unsubscribe the previous queries
     socket.on('unsubscribe', queries => {
-      // Looping through all the queries
       queries.forEach(query => {
+        // Unsubscribe
         socket.leave(query);
+        // Client unSubscribe to this query
+        io.of('/analysis').emit('serverMsg', `A Member leaved ${query}`);
       });
     });
   });
 
   // Socket.io Helper functions
   // Broadcasting Query message to subscribtion
-  var broadcastInverval = setInterval(async () => {
-    try {
-      // handle looseness & variety of random text
-      var doc = await nlp(data)
-        .normalize()
-        .out('text');
+  setInterval(() => {
+    channels.forEach(async channel => {
+      try {
+        // handle looseness & variety of random text
+        var doc = await nlp(channel.stream.data)
+          .normalize()
+          .out('text');
 
-      // Analyse the tweets
-      if (doc !== undefined) {
-        const emotions = await analyseTweets(doc);
-        let currentTime = moment(Date.now()).format('HH:mm:ss');
-        currentTime = currentTime.slice(0, -1) + '0';
+        // Analyse the tweets
+        if (doc !== undefined) {
+          const emotions = await analyseTweets(doc);
+          const currentTime =
+            moment(Date.now())
+              .format('HH:mm:ss')
+              .slice(0, -1) + '0';
 
-        // console.log(`Sending Broadcast`, emotions);
+          // console.log(`Sending Broadcast`, emotions);
 
+          io.of('/analysis')
+            .to(channel.name)
+            .emit('subscriptionData', {
+              [channel.name]: {
+                [currentTime]: emotions
+              }
+            });
+        }
+
+        channel.stream.data = '';
+      } catch (err) {
+        console.log(`No data for ${channel.name}`);
         io.of('/analysis')
-          .to(analysis)
-          .emit('subscriptionData', {
-            [analysis]: {
-              [currentTime]: emotions
-            }
-          });
+          .to(channel.name)
+          .emit('serverMsg', `No data for ${channel.name}`);
       }
-
-      data = '';
-    } catch (err) {
-      console.log('No data for analysis');
-      io.of('/analysis')
-        .to(analysis)
-        .emit('serverMsg', `No data for ${analysis}`);
-    }
+    });
   }, BROADCAST_TIME);
 
   // Check if no one is connected for the stream
   // if no one is connected, close the stream and socket
-  var checkerInverval = setInterval(() => {
-    io.of('/analysis')
-      .in(analysis)
-      .clients((error, clients) => {
-        if (error) throw error;
-        console.log(`${clients.length} Connected Users searching: ${analysis}`);
-        data = '';
-        if (clients.length === 0) {
-          console.log('Closing Stream');
-          analysis = _.without(analysis, analysis);
-          data = '';
-          if (stream !== undefined) {
-            stream.stop();
+  setInterval(async () => {
+    let channelRemoveList = [];
+    await _.forEach(channels, channel => {
+      // inside Removes Channels method
+      io.of('/analysis')
+        .in(channel.name)
+        .clients((error, clients) => {
+          if (error) throw error;
+          console.log(
+            `${clients.length} Connected Users searching: ${channel.name}`
+          );
+          if (clients.length === 0) {
+            // If no one subscribe the channel anymore
+            // Stop the Twit stream
+            channel.stream.stop();
+            // Push this channel into remove list
+            channelRemoveList.push(channel.name);
           }
-          clearInterval(broadcastInverval);
-          clearInterval(checkerInverval);
-        }
-      });
+        });
+    });
+
+    // Remove the channels according the filter list generated above
+    channels = await channels.filter(
+      channel => !channelRemoveList.includes(channel.name)
+    );
+
+    // Print the Tracking Channels
     console.log('------------- Socket.io -----------------');
     console.log('Tracking Items : ');
-    console.log(analysis);
+    console.log(channels.map(channel => channel.name));
   }, REMOVE_UNUSED_QUERY_TIME);
 };
