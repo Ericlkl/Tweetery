@@ -15,13 +15,13 @@ class TwitStream {
   constructor(queries, queryName) {
     this.data = '';
     this.queryName = queryName;
+    this.stream = T.stream('statuses/filter', {
+      track: queries,
+      language: 'en'
+    });
 
     try {
       // Start stream
-      this.stream = T.stream('statuses/filter', {
-        track: queries,
-        language: 'en'
-      });
 
       console.log('Tracking: ' + queryName);
 
@@ -56,6 +56,11 @@ class TwitStream {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  stop() {
+    this.stream.stop();
+    console.log(`${this.queryName} Stream stoped`);
   }
 }
 

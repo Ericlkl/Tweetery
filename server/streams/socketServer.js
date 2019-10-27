@@ -1,4 +1,4 @@
-let channels = [];
+var channels = [];
 
 const _ = require('lodash');
 const moment = require('moment');
@@ -14,7 +14,7 @@ const TwitStream = require('../model/TwitStream');
 // Default Broadcast time = 5Sec / REMOVE_UNUSED_QUERY_TIME = 60Min
 
 const BROADCAST_TIME = 10000;
-const REMOVE_UNUSED_QUERY_TIME = 60000;
+const REMOVE_UNUSED_QUERY_TIME = 40000;
 
 module.exports = expressServer => {
   try {
@@ -106,8 +106,6 @@ module.exports = expressServer => {
         console.log('Error Msg');
         console.log(err);
         console.log(`No data for ${channel.name}`);
-        console.log('Stream Data Check');
-        // console.log(channel.stream.data);
         io.of('/analysis')
           .to(channel.name)
           .emit('serverMsg', `No data for ${channel.name}`);
@@ -117,9 +115,9 @@ module.exports = expressServer => {
 
   // Check if no one is connected for the stream
   // if no one is connected, close the stream and socket
-  setInterval(() => {
-    channels = _.remove(channels, channel => {
-      let keepChannel = true;
+  setInterval(async () => {
+    let channelRemoveList = [];
+    await _.forEach(channels, channel => {
       // inside Removes Channels method
       io.of('/analysis')
         .in(channel.name)
@@ -129,14 +127,15 @@ module.exports = expressServer => {
             `${clients.length} Connected Users searching: ${channel.name}`
           );
           if (clients.length === 0) {
-            console.log('Closing Stream');
             channel.stream.stop();
-            keepChannel = false;
+            channelRemoveList.push(channel.name);
           }
         });
-
-      return keepChannel;
     });
+
+    channels = await channels.filter(
+      channel => !channelRemoveList.includes(channel.name)
+    );
 
     console.log('------------- Socket.io -----------------');
     console.log('Tracking Items : ');
