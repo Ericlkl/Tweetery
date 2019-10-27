@@ -101,7 +101,7 @@ module.exports = expressServer => {
 
   // Socket.io Helper functions
   // Broadcasting Query message to each subscribtion
-  setInterval(async () => {
+  var broadcastInverval = setInterval(async () => {
 
 
     // handle looseness & variety of random text
@@ -128,8 +128,9 @@ module.exports = expressServer => {
     data = '';
   }, BROADCAST_TIME);
 
-// Remove Query Tracking if no one using
-  setInterval(() => {
+  // Check if no one is connected for the stream
+  // if no one is connected, close the stream and socket
+  var checkerInverval = setInterval(() => {
     // analysis.forEach(query => {
       // If there no one user in the room(Socket.io terms)
       // It means no one tracking this query
@@ -138,13 +139,16 @@ module.exports = expressServer => {
       .in(analysis)
       .clients((error, clients) => {
         if (error) throw error;
-        console.log(`User Number for ${analysis} : ${clients.length}`);
+        console.log(`${clients.length} Connected Users searching: ${analysis}`);
         data = '';
-        stream.stop();
         if (clients.length === 0) {
           analysis = _.without(analysis, analysis);
           data = '';
-          stream.stop();
+          if (stream !== undefined){
+            stream.stop();
+          }
+          clearInterval(broadcastInverval);
+          clearInterval(checkerInverval);
         }
       });
     // });
