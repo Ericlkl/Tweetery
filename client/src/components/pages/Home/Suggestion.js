@@ -20,7 +20,9 @@ import TweetsContext from '../../../context/Tweets/TweetsContext';
 const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(3, 2),
-    height: '100%'
+    height: '100%',
+    maxHeight: 600,
+    overflow: 'auto'
   }
 }));
 
