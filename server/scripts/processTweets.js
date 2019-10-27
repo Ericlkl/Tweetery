@@ -32,14 +32,14 @@ async function getTweets(query, day) {
 
     // search twitter for all tweets containing the query
     T.get('search/tweets', params).then(response => {
-      // articles found for the search query
+      // Tweets found for the search query
       if (response.totalResults !== 0) {
         resolve(response);
       }
 
       // No tweets found
       else if (response.length === 0) {
-        reject('We could not find any articles for: ' + query);
+        reject('We could not find any tweets for: ' + query);
       }
 
       // Promise rejected
