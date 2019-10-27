@@ -78,6 +78,7 @@ module.exports = expressServer => {
     console.log(err);
   }
   const io = require('socket.io')(expressServer);
+  io.set('origins', '*:*');
   io.of('/analysis').on('connection', socket => {
     // Connect Successfully
     io.of('/analysis').emit('serverMsg', 'Server Connect Successfully');
@@ -112,23 +113,26 @@ module.exports = expressServer => {
         .out('text');
 
       // Analyse the tweets
-      const emotions = await analyseTweets(doc);
-      let currentTime = moment(Date.now()).format('HH:mm:ss');
-      currentTime = currentTime.slice(0, -1) + '0';
+      if (doc !== undefined){
+        const emotions = await analyseTweets(doc);
+        let currentTime = moment(Date.now()).format('HH:mm:ss');
+        currentTime = currentTime.slice(0, -1) + '0';
 
-      // console.log(`Sending Broadcast`, emotions);
+        // console.log(`Sending Broadcast`, emotions);
 
-      io.of('/analysis')
-        .to(analysis)
-        .emit('subscriptionData', {
-          [analysis]: {
-            [currentTime]: emotions
-          }
-        });
+        io.of('/analysis')
+          .to(analysis)
+          .emit('subscriptionData', {
+            [analysis]: {
+              [currentTime]: emotions
+            }
+          });
+      }
+      
 
       data = '';
     } catch (err) {
-      console.log("No content provided for stream to start");
+      console.log("No data for analysis");
     }
   }, BROADCAST_TIME);
 
