@@ -115,7 +115,7 @@ module.exports = expressServer => {
 
         channel.stream.data = '';
       } catch (err) {
-        console.log(`No data for ${channel.name}`);
+        console.log(`Substituted empty data for ${channel.name}`);
         var empty = {
           "emotion": {
               "sadness": 0.01,
@@ -127,7 +127,7 @@ module.exports = expressServer => {
           }
         io.of('/analysis')
           .to(channel.name)
-          .emit('serverMsg', {
+          .emit('subscriptionData', {
             [channel.name]: {
               [currentTime]: empty
             }
