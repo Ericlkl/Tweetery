@@ -118,11 +118,11 @@ module.exports = expressServer => {
         console.log(`No data for ${channel.name}`);
         var empty = {
           "emotion": {
-              "sadness": 0.510395,
-              "joy": 0.465514,
-              "fear": 0.087964,
-              "disgust": 0.129827,
-              "anger": 0.15183
+              "sadness": 0.01,
+              "joy": 0.01,
+              "fear": 0.01,
+              "disgust": 0.01,
+              "anger": 0.01
             }
           }
         io.of('/analysis')
