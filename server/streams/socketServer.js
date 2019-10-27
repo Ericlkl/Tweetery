@@ -86,6 +86,11 @@ module.exports = expressServer => {
   // Socket.io Helper functions
   // Broadcasting Query message to subscribtion
   setInterval(() => {
+    const currentTime =
+            moment(Date.now())
+              .format('HH:mm:ss')
+              .slice(0, -1) + '0';
+
     channels.forEach(async channel => {
       try {
         // handle looseness & variety of random text
@@ -96,10 +101,6 @@ module.exports = expressServer => {
         // Analyse the tweets
         if (doc !== undefined) {
           const emotions = await analyseTweets(doc);
-          const currentTime =
-            moment(Date.now())
-              .format('HH:mm:ss')
-              .slice(0, -1) + '0';
 
           // console.log(`Sending Broadcast`, emotions);
 
@@ -115,9 +116,22 @@ module.exports = expressServer => {
         channel.stream.data = '';
       } catch (err) {
         console.log(`No data for ${channel.name}`);
+        var empty = {
+          "emotion": {
+              "sadness": 0.510395,
+              "joy": 0.465514,
+              "fear": 0.087964,
+              "disgust": 0.129827,
+              "anger": 0.15183
+            }
+          }
         io.of('/analysis')
           .to(channel.name)
-          .emit('serverMsg', `No data for ${channel.name}`);
+          .emit('serverMsg', {
+            [channel.name]: {
+              [currentTime]: empty
+            }
+          });
       }
     });
   }, BROADCAST_TIME);
