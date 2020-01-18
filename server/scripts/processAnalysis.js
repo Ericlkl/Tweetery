@@ -1,12 +1,11 @@
 // Import Modules
-const express = require('express');
-
+const path = require('path');
 // Load the enviroment variables
-require('dotenv').config();
+require('dotenv').config(path.resolve(__dirname, '../'));
 
 // Use IBM library for processing analysis
-var NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1.js');
-var nlu = new NaturalLanguageUnderstandingV1({
+const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1.js');
+const nlu = new NaturalLanguageUnderstandingV1({
   // Use API key
   iam_apikey: process.env.IBM_KEY,
   version: '2018-04-05',
@@ -17,7 +16,7 @@ var nlu = new NaturalLanguageUnderstandingV1({
 
 /**
  * Analyse the emotion of the given tweets
- * 
+ *
  * @param {*} tweets - A string of tweets
  */
 async function analyseTweets(tweets) {
@@ -26,7 +25,7 @@ async function analyseTweets(tweets) {
     var params = {
       text: tweets,
       features: {
-        emotion: {},
+        emotion: {}
       }
     };
 
@@ -44,7 +43,7 @@ async function analyseTweets(tweets) {
 
 /**
  * Analyse the sentiment of the given tweets
- * 
+ *
  * @param {*} tweets - A string of tweets
  */
 async function analyseSentiment(tweets) {

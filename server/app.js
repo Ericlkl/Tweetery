@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const indexRouter = require('./routes/index');
 const { pageNotFoundHandler, errorHandler } = require('./middlewares');
 // Load the enviroment variables
-require('dotenv').config();
+require('dotenv').config(path.resolve(__dirname));
 
 const app = express();
 
@@ -19,11 +19,7 @@ app.use(express.static(path.resolve(__dirname, '../', 'client', 'build')));
 try {
   // Connect to DB
   mongoose.connect(
-    'mongodb+srv://' +
-      process.env.MONGO_USERNAME +
-      ':' +
-      process.env.MONGO_PASSWORD +
-      '@cab432-7yz8m.mongodb.net/CAB432?retryWrites=true&w=majority',
+    `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@ds229068.mlab.com:29068/tweetery`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true

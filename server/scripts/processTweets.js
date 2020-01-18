@@ -1,10 +1,10 @@
+const path = require('path');
 // Load the enviroment variables
-require('dotenv').config();
-
+require('dotenv').config(path.resolve(__dirname, '../'));
 // Import twit library
-var Twit = require('twit');
+const Twit = require('twit');
 
-var T = new Twit({
+const T = new Twit({
   consumer_key: process.env.T_CONSUMER_KEY,
   consumer_secret: process.env.T_CONSUMER_SECRET,
   access_token: process.env.T_ACCESS_TOKEN_KEY,
@@ -15,7 +15,7 @@ var T = new Twit({
 
 /**
  * Gets tweets based on the query and date
- * 
+ *
  * @param {*} query - search based on the query e.g. 'trump'
  * @param {*} day - date '2019-11-11'
  */

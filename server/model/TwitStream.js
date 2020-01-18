@@ -1,6 +1,8 @@
-// const { analyseTweets } = require('../scripts/processAnalysis');
 const Twit = require('twit');
-// const nlp = require('compromise');
+const path = require('path');
+
+// Load the enviroment variables
+require('dotenv').config(path.resolve(__dirname, '../'));
 
 const T = new Twit({
   consumer_key: process.env.T_CONSUMER_KEY,
