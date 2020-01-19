@@ -1,22 +1,29 @@
-# CAB432-A2
-CAB432-A2
+# Tweetery
 
-PORT 3000 = Front end project development,
-PORT 5000 = Server end project development
+This project aims to provide users with a visual representation of the analysis performed on searched tweets. Utilizing the Twitter API for getting tweets into the web server, cleaning the tweet body and performing emotional analysis with IBM Watson API. The results of the performed analysis are displayed on a graph for the user.
 
 ## Key Technology Include
 ```
-  ReactJS
-  ExpressJS
+HTML5
+CSS
+JavaScript ES6
+React
+React Context API
+ChartJS
+Material UI
+NodeJS
+ExpressJS
+Redis
+Socket.io
 ```
 ### Prerequisites
 
 Things you need to install the software and how to install them
 
 ```
-  NodeJS
-  NPM package manager
-  Web Browser
+NodeJS
+NPM package manager
+Web Browser
 ```
 
 ## How To Use it (Development)
