@@ -26,35 +26,15 @@ NPM package manager
 Web Browser
 ```
 
-## How To Use it (Development)
+## How To Use it 
 
 **Important** You will need to keep the working directory name as short as you can. otherwise, it might cause to some installation problem.
 
 ```
-1. cd to the root folder of this project 
-2. npm install
-3. npm run client-install
-4. npm run server-install
-5. npm run client-build
-6. npm run dev
-
+cd to the root folder of this project 
+npm run project-install
+npm run dev
 ```
-
-
-## How To Use it (Production)
-
-**Important** You will need to keep the working directory name as short as you can. otherwise, it might cause to some installation problem.
-
-```
-1. cd to the root folder of this project 
-2. npm install
-3. npm run client-install
-4. npm run server-install
-5. npm run client-build
-6. npm run server
-
-```
-
 
 ## Unit Test
 
